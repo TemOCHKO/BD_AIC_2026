@@ -3,17 +3,15 @@ import org.aic.DTOModels.ProductTableDTO;
 import org.aic.DTOModels.ProductTableModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
-public class GroceryView extends JFrame {
+public class ProductView extends JFrame {
 
     private final ProductTableModel tableModel;
     private final JButton loadDataButton;
 
-    public GroceryView() {
+    public ProductView() {
         setTitle("Product Catalog Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);

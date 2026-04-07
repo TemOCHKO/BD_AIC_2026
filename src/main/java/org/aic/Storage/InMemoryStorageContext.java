@@ -18,6 +18,8 @@ public class InMemoryStorageContext implements IStorageContext {
 
     // Mock storage (will be replaced by db soon)
     public InMemoryStorageContext() {
+
+        //region Mock Storage
         // 1. Generate 5 Grocery ProductRecords
         ProductRecord product1 = new ProductRecord(1, "Whole Milk", "Dairy Farms Inc.", "1 Gallon Whole Milk", 0);
         ProductRecord product2 = new ProductRecord(2, "Sourdough Bread", "Local Bakery", "Freshly baked sourdough loaf", 3);
@@ -113,6 +115,7 @@ public class InMemoryStorageContext implements IStorageContext {
         storeProducts = new ArrayList<>(List.of(
                 sp1, sp2, sp3, sp4, sp5, sp6, sp7, sp8, sp9, sp10
         ));
+        //endregion
 
         // 3. Print to verify
         System.out.println("--- Grocery Products (" + products.size() + ") ---");
