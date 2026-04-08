@@ -1,7 +1,7 @@
 package models;
 
 public class Employee {
-    private int id_employee;
+    private String id_employee;
     private String empl_surname;
     private String empl_name;
     private String empl_patronymic;
@@ -14,7 +14,7 @@ public class Employee {
     private String street;
     private String zip_code;
 
-    public Employee(int id_employee, String empl_surname, String empl_name,
+    public Employee(String id_employee, String empl_surname, String empl_name,
                     String empl_patronymic, String empl_role, double salary,
                     String date_of_birth, String date_of_start, String phone_number,
                     String city, String street, String zipcode) {
@@ -32,7 +32,7 @@ public class Employee {
         this.zip_code = zipcode;
     }
 
-    public int getId_employee() {
+    public String getId_employee() {
         return id_employee;
     }
     public String getEmpl_surname() {
@@ -69,7 +69,7 @@ public class Employee {
         return zip_code;
     }
 
-    public void setId_employee(int id_employee) {
+    public void setId_employee(String id_employee) {
         this.id_employee = id_employee;
     }
     public void setEmpl_surname(String empl_surname) {

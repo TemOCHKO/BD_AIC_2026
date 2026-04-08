@@ -139,13 +139,13 @@ public class EmplDao {
         stmt.setString(9, emp.getCity());
         stmt.setString(10, emp.getStreet());
         stmt.setString(11, emp.getZip_code());
-        stmt.setInt(12, emp.getId_employee());
+        stmt.setString(12, emp.getId_employee());
         stmt.executeUpdate();
     }
 
     private Employee mapEmployee(ResultSet rs) throws SQLException {
         return new Employee(
-                rs.getInt("id_employee"),
+                rs.getString("id_employee"),
                 rs.getString("empl_surname"),
                 rs.getString("empl_name"),
                 rs.getString("empl_patronymic"),

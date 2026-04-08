@@ -2,13 +2,13 @@ package models;
 
 public class Check {
     private int check_number;
-    private int id_employee;
+    private String id_employee;
     private String card_number;
     private String print_date;
     private double sum_total;
     private double vat;
 
-    public Check(int check_number, int id_employee,
+    public Check(int check_number, String id_employee,
                  String card_number, String print_date,
                  double sum_total, double vat) {
         this.check_number = check_number;
@@ -22,7 +22,7 @@ public class Check {
     public int getCheck_number() {
         return check_number;
     }
-    public int getId_employee() {
+    public String getId_employee() {
         return id_employee;
     }
     public String getCard_number() {
@@ -41,7 +41,7 @@ public class Check {
     public void setCheck_number(int check_number) {
         this.check_number = check_number;
     }
-    public void setId_employee(int id_employee) {
+    public void setId_employee(String id_employee) {
         this.id_employee = id_employee;
     }
     public void setCard_number(String card_number) {
