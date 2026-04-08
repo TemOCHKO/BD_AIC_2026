@@ -2,6 +2,7 @@ package org.aic;
 
 import java.awt.*;
 
+@Deprecated
 public enum ProductType {
     DIARY,
     FRESH,

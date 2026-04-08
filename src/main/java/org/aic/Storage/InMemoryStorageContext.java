@@ -1,5 +1,6 @@
 package org.aic.Storage;
 
+import org.aic.DBModels.CategoryDBModel;
 import org.aic.DBModels.ProductDBModel;
 import org.aic.DBModels.StoreProductDBModel;
 
@@ -8,10 +9,12 @@ import java.util.List;
 
 public class InMemoryStorageContext implements IStorageContext {
 
+    private record CategoryRecord (int dbId, String name) {}
     private record ProductRecord (int dbId, String title, String manufacturer, String description, int categoryNumber)  {}
     private record StoreProductRecord (String upc, String upcSale, int productId, double price, int numberOfProducts, boolean promotionalProduct) {}
 
     // Lists will become obsolete once db appears
+    private static ArrayList<CategoryRecord> categories = new ArrayList<>();
     private static ArrayList<ProductRecord> products = new ArrayList<>();
     private static ArrayList<StoreProductRecord> storeProducts = new ArrayList<>();
 
@@ -115,6 +118,37 @@ public class InMemoryStorageContext implements IStorageContext {
         storeProducts = new ArrayList<>(List.of(
                 sp1, sp2, sp3, sp4, sp5, sp6, sp7, sp8, sp9, sp10
         ));
+
+        /*
+        DIARY,
+        FRESH,
+        MEAT,
+        BAKERY,
+        SEAFOOD,
+        BEVERAGE,
+        PACKAGED,
+        DRYGOODS,
+        PHARMACY,
+        HOUSEHOLD,
+        PET
+         */
+
+        CategoryRecord c1 = new CategoryRecord(0, "DIARY");
+        CategoryRecord c2 = new CategoryRecord(1, "FRESH");
+        CategoryRecord c3 = new CategoryRecord(2, "MEAT");
+        CategoryRecord c4 = new CategoryRecord(3, "BAKERY");
+        CategoryRecord c5 = new CategoryRecord(4, "SEAFOOD");
+        CategoryRecord c6 = new CategoryRecord(5, "BEVERAGE");
+        CategoryRecord c7 = new CategoryRecord(6, "PACKAGED");
+        CategoryRecord c8 = new CategoryRecord(7, "DRY GOODS");
+        CategoryRecord c9 = new CategoryRecord(8, "PHARMACY");
+        CategoryRecord c10 = new CategoryRecord(9, "HOUSEHOLD");
+        CategoryRecord c11 = new CategoryRecord(10, "PET");
+
+        categories = new ArrayList<>(List.of(
+                c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11
+        ));
+
         //endregion
 
         // 3. Print to verify
@@ -123,6 +157,10 @@ public class InMemoryStorageContext implements IStorageContext {
 
         System.out.println("\n--- Store Inventory (" + storeProducts.size() + ") ---");
         storeProducts.forEach(System.out::println);
+
+        System.out.println("--- Categories (" + categories.size() + ") ---");
+        categories.forEach(System.out::println);
+
     }
 
     @Override
@@ -162,6 +200,20 @@ public class InMemoryStorageContext implements IStorageContext {
     @Override
     public ProductDBModel getProductByName(String name) {
         return null;
+    }
+
+    @Override
+    public void saveNewProduct(ProductDBModel productDBModel) {
+        products.add(new ProductRecord(productDBModel.dbId, productDBModel.title, productDBModel.manufacturer, productDBModel.description, productDBModel.categoryNumber));
+    }
+
+    @Override
+    public Iterable<CategoryDBModel> getCategories() {
+        var result = new ArrayList<CategoryDBModel>();
+        for (var category : categories) {
+            result.add(new CategoryDBModel(category.dbId, category.name));
+        }
+        return result;
     }
 
 }

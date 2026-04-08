@@ -10,6 +10,7 @@ public class ProductView extends JFrame {
 
     private final ProductTableModel tableModel;
     private final JButton loadDataButton;
+    private final JButton createNewProductButton;
 
     public ProductView() {
         setTitle("Product Catalog Management");
@@ -28,16 +29,20 @@ public class ProductView extends JFrame {
         // Setup Button Panel
         JPanel bottomPanel = new JPanel();
         loadDataButton = new JButton("Load Products");
+        createNewProductButton = new JButton("Create New Product");
         bottomPanel.add(loadDataButton);
+        bottomPanel.add(createNewProductButton);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
     // --- MVC METHODS: How the Controller talks to the View ---
 
     // Expose the button so the Controller can attach an ActionListener
+    public ProductTableModel getTableModel() { return tableModel; }
     public JButton getLoadDataButton() {
         return loadDataButton;
     }
+    public JButton getCreateNewProductButton() { return createNewProductButton; }
 
     // Method to populate the top table
     public void displayProducts(Iterable<ProductTableDTO> products) {

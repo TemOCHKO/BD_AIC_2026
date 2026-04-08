@@ -26,4 +26,9 @@ public class ProductRepository implements IProductRepository {
     public Iterable<ProductDBModel> getProducts() {
         return storageContext.getProducts();
     }
+
+    @Override
+    public void saveNewProduct(ProductDBModel productDBModel) {
+        storageContext.saveNewProduct(productDBModel);
+    }
 }

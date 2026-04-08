@@ -10,16 +10,16 @@ public class ProductTableDTO {
     private int dbId;
     private String title;
     private String manufacturer;
-    private ProductType category;
+    private String categoryName;
 
-    public ProductTableDTO(UUID id, int dbId, String title, String manufacturer, int productTypeId) {
+    public ProductTableDTO(UUID id, int dbId, String title, String manufacturer, String categoryName) {
         this.id = id;
         this.dbId = dbId;
         this.title = title;
         this.manufacturer = manufacturer;
 
         // TODO fix this kostyl
-        this.category = ProductType.values() [productTypeId];
+        this.categoryName = categoryName;
 
     }
 
@@ -44,7 +44,7 @@ public class ProductTableDTO {
         return manufacturer;
     }
 
-    public ProductType getCategory() {
-        return category;
+    public String getCategory() {
+        return categoryName;
     }
 }

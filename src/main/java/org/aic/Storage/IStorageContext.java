@@ -1,5 +1,6 @@
 package org.aic.Storage;
 
+import org.aic.DBModels.CategoryDBModel;
 import org.aic.DBModels.ProductDBModel;
 import org.aic.DBModels.StoreProductDBModel;
 
@@ -9,4 +10,6 @@ public interface IStorageContext {
     ProductDBModel getProduct(int id);
     StoreProductDBModel getStoreProduct(String upc);
     ProductDBModel getProductByName(String name);
+    void saveNewProduct(ProductDBModel productDBModel);
+    Iterable<CategoryDBModel> getCategories();
 }

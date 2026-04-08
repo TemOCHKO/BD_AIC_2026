@@ -24,5 +24,10 @@ public class ProductService implements IProductService {
     public ProductDBModel getProductById(int id) {
         return productRepository.getProductById(id);
     }
+
+    @Override
+    public void saveNewProduct(ProductDBModel productDBModel) {
+        productRepository.saveNewProduct(productDBModel);
+    }
 }
 
