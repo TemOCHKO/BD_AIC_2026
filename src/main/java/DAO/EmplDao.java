@@ -26,17 +26,18 @@ public class EmplDao {
 
         PreparedStatement stmt = connection.prepareStatement(sql);
 
-        stmt.setString(1, emp.getEmpl_surname());
-        stmt.setString(2, emp.getEmpl_name());
-        stmt.setString(3, emp.getEmpl_patronymic());
-        stmt.setString(4, emp.getEmpl_role());
-        stmt.setDouble(5, emp.getSalary());
-        stmt.setString(6, emp.getDate_of_start());
+        stmt.setString(1, emp.getId_employee());
+        stmt.setString(2, emp.getEmpl_surname());
+        stmt.setString(3, emp.getEmpl_name());
+        stmt.setString(4, emp.getEmpl_patronymic());
+        stmt.setString(5, emp.getEmpl_role());
+        stmt.setDouble(6, emp.getSalary());
         stmt.setString(7, emp.getDate_of_birth());
-        stmt.setString(8, emp.getPhone_number());
-        stmt.setString(9, emp.getCity());
-        stmt.setString(10, emp.getStreet());
-        stmt.setString(11, emp.getZip_code());
+        stmt.setString(8, emp.getDate_of_start());
+        stmt.setString(9, emp.getPhone_number());
+        stmt.setString(10, emp.getCity());
+        stmt.setString(11, emp.getStreet());
+        stmt.setString(12, emp.getZip_code());
 
         stmt.executeUpdate();
 
