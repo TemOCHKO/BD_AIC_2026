@@ -4,6 +4,8 @@ import org.aic.DBModels.CategoryDBModel;
 import org.aic.DBModels.ProductDBModel;
 import org.aic.DBModels.StoreProductDBModel;
 
+import java.util.HashMap;
+
 public interface IStorageContext {
     Iterable<ProductDBModel> getProducts();
     Iterable<StoreProductDBModel> getStoreProducts();
@@ -12,4 +14,5 @@ public interface IStorageContext {
     ProductDBModel getProductByName(String name);
     void saveNewProduct(ProductDBModel productDBModel);
     Iterable<CategoryDBModel> getCategories();
+    HashMap<Integer, String> getCategoryMap();
 }

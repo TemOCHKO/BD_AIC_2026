@@ -5,8 +5,10 @@ import org.aic.DBModels.ProductDBModel;
 import org.aic.DBModels.StoreProductDBModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+@Deprecated
 public class InMemoryStorageContext implements IStorageContext {
 
     private record CategoryRecord (int dbId, String name) {}
@@ -204,7 +206,7 @@ public class InMemoryStorageContext implements IStorageContext {
 
     @Override
     public void saveNewProduct(ProductDBModel productDBModel) {
-        products.add(new ProductRecord(productDBModel.dbId, productDBModel.title, productDBModel.manufacturer, productDBModel.description, productDBModel.categoryNumber));
+        products.add(new ProductRecord(productDBModel.getDbId(), productDBModel.getTitle(), productDBModel.getManufacturer(), productDBModel.getDescription(), productDBModel.getCategoryNumber()));
     }
 
     @Override
@@ -214,6 +216,15 @@ public class InMemoryStorageContext implements IStorageContext {
             result.add(new CategoryDBModel(category.dbId, category.name));
         }
         return result;
+    }
+
+    @Override
+    public HashMap<Integer, String> getCategoryMap() {
+        var res = new HashMap<Integer, String>();
+        for (var category : categories) {
+            res.put(category.dbId, category.name);
+        }
+        return res;
     }
 
 }

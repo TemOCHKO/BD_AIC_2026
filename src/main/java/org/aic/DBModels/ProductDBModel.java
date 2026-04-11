@@ -2,12 +2,12 @@ package org.aic.DBModels;
 import java.util.UUID;
 
 public class ProductDBModel {
-    public UUID id;
-    public int dbId;
-    public String title;
-    public String manufacturer;
-    public String description;
-    public int categoryNumber;
+    private UUID id;
+    private int dbId;
+    private String title;
+    private String manufacturer;
+    private String description;
+    private int categoryNumber;
 
     // No entity in database yet
     public ProductDBModel(String title, String manufacturer, String description, int categoryNumber)  {
@@ -28,5 +28,53 @@ public class ProductDBModel {
     public ProductDBModel(int dbId, String title, String manufacturer, String description, int categoryNumber)  {
         this(UUID.randomUUID(), title, manufacturer, description, categoryNumber);
         this.dbId = dbId;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public int getDbId() {
+        return dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getCategoryNumber() {
+        return categoryNumber;
+    }
+
+    public void setCategoryNumber(int categoryNumber) {
+        this.categoryNumber = categoryNumber;
     }
 }

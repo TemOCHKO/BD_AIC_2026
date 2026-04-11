@@ -1,18 +1,48 @@
 package org.aic.Services;
 
 import org.aic.DBModels.ProductDBModel;
+import org.aic.DTOModels.ProductTableDTO;
+import org.aic.Repositories.ICategoryRepository;
 import org.aic.Repositories.IProductRepository;
 
-public class ProductService implements IProductService {
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class ProductService implements IProductService{
     private final IProductRepository productRepository;
-    public ProductService(IProductRepository productRepository)
-    {
+    private final ICategoryRepository categoryRepository;
+
+    // TODO Maybe better to do with joins right on products?
+    public HashMap<Integer, String> categoryMap;
+
+    public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        categoryMap = getCategoryMap();
     }
 
     @Override
     public Iterable<ProductDBModel> getAllProducts() {
-        return productRepository.getProducts();
+        try {
+            return productRepository.getAllProducts();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Iterable<ProductTableDTO> getAllDTOProducts() {
+        var prods = getAllProducts();
+        var dtos = new ArrayList<ProductTableDTO>();
+
+        for (var prod : prods) {
+            String categoryName = categoryMap.get(prod.getCategoryNumber());
+
+            dtos.add(new ProductTableDTO(prod.getId(), prod.getDbId(), prod.getTitle(), prod.getManufacturer(), categoryName));
+        }
+
+        return dtos;
     }
 
     @Override
@@ -27,7 +57,20 @@ public class ProductService implements IProductService {
 
     @Override
     public void saveNewProduct(ProductDBModel productDBModel) {
-        productRepository.saveNewProduct(productDBModel);
+        try {
+            productRepository.saveNewProduct(productDBModel);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public HashMap<Integer, String> getCategoryMap() {
+        try {
+            return categoryRepository.getCategoryMap();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
 
