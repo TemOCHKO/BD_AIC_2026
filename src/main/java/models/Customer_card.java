@@ -1,7 +1,7 @@
 package models;
 
 public class Customer_card {
-    private int card_number;
+    private String card_number;
     private String cust_surname;
     private String cust_name;
     private String cust_patronymic;
@@ -9,14 +9,14 @@ public class Customer_card {
     private String city;
     private String street;
     private String zip_code;
-    private double percent;
+    private int percent;
 
-    public Customer_card(int card_number, String cust_name, String cust_surname,
+    public Customer_card(String card_number, String cust_surname, String cust_name,
                          String cust_patronymic, String phone_number, String city,
-                         String street, String zip_code, double percent) {
+                         String street, String zip_code, int percent) {
         this.card_number = card_number;
-        this.cust_name = cust_name;
         this.cust_surname = cust_surname;
+        this.cust_name = cust_name;
         this.cust_patronymic = cust_patronymic;
         this.phone_number = phone_number;
         this.city = city;
@@ -24,14 +24,14 @@ public class Customer_card {
         this.zip_code = zip_code;
         this.percent = percent;
     }
-    public int getCard_number() {
+    public String getCard_number() {
         return card_number;
-    }
-    public String getCust_name() {
-        return cust_name;
     }
     public String getCust_surname() {
         return cust_surname;
+    }
+    public String getCust_name() {
+        return cust_name;
     }
     public String getCust_patronymic() {
         return cust_patronymic;
@@ -48,18 +48,18 @@ public class Customer_card {
     public String getZip_code() {
         return zip_code;
     }
-    public double getPercent() {
+    public int getPercent() {
         return percent;
     }
 
-    public void setCard_number(int card_number) {
+    public void setCard_number(String card_number) {
         this.card_number = card_number;
-    }
-    public void setCust_name(String cust_name) {
-        this.cust_name = cust_name;
     }
     public void setCust_surname(String cust_surname) {
         this.cust_surname = cust_surname;
+    }
+    public void setCust_name(String cust_name) {
+        this.cust_name = cust_name;
     }
     public void setCust_patronymic(String cust_patronymic) {
         this.cust_patronymic = cust_patronymic;
@@ -76,7 +76,7 @@ public class Customer_card {
     public void setZip_code(String zip_code) {
         this.zip_code = zip_code;
     }
-    public void setPercent(double percent) {
+    public void setPercent(int percent) {
         this.percent = percent;
     }
 }
