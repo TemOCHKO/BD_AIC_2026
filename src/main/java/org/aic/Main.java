@@ -20,9 +20,9 @@ public class Main {
         );
 
         // 2. додати нову категорію
-        Category newCategory = new Category(0, "Молочні продукти");
+        /*Category newCategory = new Category(0, "Молочні продукти");
         dao.addCategory(newCategory);
-        System.out.println("Категорію додано!");
+        System.out.println("Категорію додано!");*/
 
         // 3. всі категорії відсортовані за назвою
         System.out.println("=== Категорії відсортовані за назвою ===");
@@ -32,7 +32,7 @@ public class Main {
         );
 
         // 4. оновити категорію
-        boolean updated = dao.updateCategory(1, "Хлібобулочні вироби");
+        boolean updated = dao.updateCategory(3, "Хлібобулочні вироби");
         if (updated) {
             System.out.println("Категорію оновлено!");
         } else {
@@ -47,7 +47,7 @@ public class Main {
         );
 
         // 6. видалити категорію
-        boolean deleted = dao.deleteCategory(1);
+       /* boolean deleted = dao.deleteCategory(3);
         if (deleted) {
             System.out.println("Категорію видалено!");
         } else {
@@ -61,6 +61,6 @@ public class Main {
                 System.out.println(c.getCategory_number() + " | " + c.getCategory_name())
         );
 
-        connection.close();
+        connection.close();*/
     }
 }
