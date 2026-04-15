@@ -49,7 +49,7 @@ public class CheckDao {
     public List<Check> getChecksForLastThreeYears() throws SQLException {
         List<Check> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM `Check` WHERE print_date >= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+        String sql = "SELECT * FROM `Check` WHERE print_date >= CURDATE() - INTERVAL 3 YEAR";
 
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
@@ -75,5 +75,49 @@ public class CheckDao {
 
         int rowsAffected = stmt.executeUpdate();
         return rowsAffected > 0;
+    }
+
+    // Список чеків конкретного касира за певний період
+    public List<Check> getChecksByEmployeeAndPeriod(String idEmployee, String dateFrom, String dateTo) throws SQLException {
+        List<Check> list = new ArrayList<>();
+        String sql = "SELECT * FROM `Check` WHERE id_employee = ? AND print_date >= ? AND print_date <= ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, idEmployee);
+            stmt.setString(2, dateFrom);
+            stmt.setString(3, dateTo);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(new Check(
+                        rs.getString("check_number"),
+                        rs.getString("id_employee"),
+                        rs.getString("card_number"),
+                        rs.getString("print_date"),
+                        rs.getDouble("sum_total"),
+                        rs.getDouble("vat")
+                ));
+            }
+        }
+        return list;
+    }
+
+    // Пошук чека за номером з усіма деталями
+    public Check getCheckByNumber(String checkNumber) throws SQLException {
+        String sql = "SELECT * FROM `Check` WHERE check_number = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, checkNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Check(
+                        rs.getString("check_number"),
+                        rs.getString("id_employee"),
+                        rs.getString("card_number"),
+                        rs.getString("print_date"),
+                        rs.getDouble("sum_total"),
+                        rs.getDouble("vat")
+                );
+            }
+        }
+        return null;
     }
 }

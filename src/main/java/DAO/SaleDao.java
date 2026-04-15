@@ -87,4 +87,29 @@ public class SaleDao {
         stmt.setString(1, checkNumber);
         stmt.executeUpdate();
     }
+    // Визначити загальну суму проданих товарів за період (всіма касирами)
+    public double getTotalSalesSum(String dateFrom, String dateTo) throws SQLException {
+        String sql = "SELECT SUM(c.sum_total) as total " +
+                "FROM `Check` c " +
+                "WHERE c.print_date BETWEEN ? AND ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, dateFrom);
+            stmt.setString(2, dateTo);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getDouble("total") : 0.0;
+        }
+    }
+
+    // Визначити загальну суму продажів конкретного касира за період
+    public double getSalesSumByEmployee(String idEmployee, String dateFrom, String dateTo) throws SQLException {
+        String sql = "SELECT SUM(sum_total) as total FROM `Check` " +
+                "WHERE id_employee = ? AND print_date BETWEEN ? AND ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, idEmployee);
+            stmt.setString(2, dateFrom);
+            stmt.setString(3, dateTo);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getDouble("total") : 0.0;
+        }
+    }
 }

@@ -79,4 +79,74 @@ public class CustomerCardDao {
         int rowsAffected = stmt.executeUpdate();
         return rowsAffected > 0;
     }
+    public List<Customer_card> getCustomerBySurname(String surname) throws SQLException {
+        List<Customer_card> list = new ArrayList<>();
+        // Просто шукаємо точний збіг прізвища
+        String sql = "SELECT * FROM Customer_Card WHERE cust_surname = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, surname);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            list.add(new Customer_card(
+                    rs.getString("card_number"),
+                    rs.getString("cust_surname"),
+                    rs.getString("cust_name"),
+                    rs.getString("cust_patronymic"),
+                    rs.getString("phone_number"),
+                    rs.getString("city"),
+                    rs.getString("street"),
+                    rs.getString("zip_code"),
+                    rs.getInt("percent")
+            ));
+        }
+        return list;
+    }
+    public List<Customer_card> getCustomersByPercent(int percent) throws SQLException {
+        List<Customer_card> list = new ArrayList<>();
+        String sql = "SELECT * FROM Customer_Card WHERE percent = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, percent);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            list.add(new Customer_card(
+                    rs.getString("card_number"),
+                    rs.getString("cust_surname"),
+                    rs.getString("cust_name"),
+                    rs.getString("cust_patronymic"),
+                    rs.getString("phone_number"),
+                    rs.getString("city"),
+                    rs.getString("street"),
+                    rs.getString("zip_code"),
+                    rs.getInt("percent")
+            ));
+        }
+        return list;
+    }
+    public List<Customer_card> getAllCustomerCardsSorted() throws SQLException {
+        List<Customer_card> list = new ArrayList<>();
+        // Просто вибираємо всіх і кажемо базі посортувати
+        String sql = "SELECT * FROM Customer_Card ORDER BY cust_surname ASC";
+
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            list.add(new Customer_card(
+                    rs.getString("card_number"),
+                    rs.getString("cust_surname"),
+                    rs.getString("cust_name"),
+                    rs.getString("cust_patronymic"),
+                    rs.getString("phone_number"),
+                    rs.getString("city"),
+                    rs.getString("street"),
+                    rs.getString("zip_code"),
+                    rs.getInt("percent")
+            ));
+        }
+        return list;
+    }
 }

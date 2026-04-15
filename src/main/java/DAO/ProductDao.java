@@ -70,7 +70,7 @@ public class ProductDao {
         return stmt.executeUpdate() > 0;
     }
 
-    // всі товари відсортовані за назвою (вимога менеджера №9 і касира №1)
+    // всі товари відсортовані за назвою
     public List<Product> getAllProductsSortedByName() throws SQLException {
         List<Product> list = new ArrayList<>();
 
@@ -90,7 +90,7 @@ public class ProductDao {
         return list;
     }
 
-    // пошук товарів за категорією (вимога менеджера №13 і касира №5)
+    // пошук товарів за категорією
     public List<Product> getProductsByCategory(int categoryNumber) throws SQLException {
         List<Product> list = new ArrayList<>();
 
@@ -111,7 +111,7 @@ public class ProductDao {
         return list;
     }
 
-    // пошук за назвою (вимога касира №4)
+    // пошук за назвою
     public List<Product> getProductsByName(String name) throws SQLException {
         List<Product> list = new ArrayList<>();
 

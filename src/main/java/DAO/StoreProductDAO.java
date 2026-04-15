@@ -1,7 +1,6 @@
 package DAO;
 
 import models.Store_Product;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,154 +12,80 @@ public class StoreProductDAO {
         this.connection = conn;
     }
 
+    // 1. Додавання товару з автоматичним розрахунком акційної ціни
     public void addStoreProduct(Store_Product sp) throws SQLException {
-        try {
-            String sql = "INSERT INTO Store_Product(upc, upc_prom, id_product, selling_price, products_number, promotional_product) VALUES (?, ?, ?, ?, ?, ?)";
-
-            PreparedStatement stmt = connection.prepareStatement(sql);
-
-            stmt.setString(1, sp.getUPC());
-            stmt.setString(2, sp.getUPC_prom());
-            stmt.setInt(3, sp.getId_product());
-            stmt.setString(4, sp.getSelling_price());
-            stmt.setInt(5, sp.getProducts_number());
-            stmt.setBoolean(6, sp.getPromotional_product());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Якщо товар акційний, ціна стає на 20% меншою (множимо на 0.8)
+        double price = Double.parseDouble(sp.getSelling_price());
+        if (sp.getPromotional_product()) {
+            price = price * 0.8;
         }
-    }
-    public boolean deleteStoreProduct(String upc) throws SQLException {
-        String sql = "DELETE FROM Store_Product WHERE upc = ?";
 
+        String sql = "INSERT INTO Store_Product (upc, upc_prom, id_product, selling_price, products_number, promotional_product) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql);
-        stmt.setString(1, upc);
-
-        int rowsAffected = stmt.executeUpdate();
-        return rowsAffected > 0;
+        stmt.setString(1, sp.getUPC());
+        stmt.setString(2, sp.getUPC_prom());
+        stmt.setInt(3, sp.getId_product());
+        stmt.setDouble(4, price); // Записуємо вже оброблену ціну
+        stmt.setInt(5, sp.getProducts_number());
+        stmt.setBoolean(6, sp.getPromotional_product());
+        stmt.executeUpdate();
     }
-    public List<Store_Product> getAllStoreProducts() throws SQLException {
-        List<Store_Product> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM Store_Product";
+    // 2. Отримати ВСІ товари, відсортовані за кількістю (Вимога менеджера №10)
+    public List<Store_Product> getAllSortedByNumber() throws SQLException {
+        List<Store_Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM Store_Product ORDER BY products_number DESC";
+
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
-
         while (rs.next()) {
-            Store_Product sp = new Store_Product(
-                    rs.getString("upc"),
-                    rs.getString("upc_prom"),
-                    rs.getInt("id_product"),
-                    rs.getString("selling_price"),
-                    rs.getInt("products_number"),
-                    rs.getBoolean("promotional_product")
-            );
-            list.add(sp);
-        }
-        return list;
-    }
-    // оновлення товару в магазині
-    public boolean updateStoreProduct(Store_Product sp) throws SQLException {
-        String sql = "UPDATE Store_Product SET upc_prom = ?, id_product = ?, selling_price = ?, products_number = ?, promotional_product = ? WHERE upc = ?";
-
-        PreparedStatement stmt = connection.prepareStatement(sql);
-        stmt.setString(1, sp.getUPC_prom());
-        stmt.setInt(2, sp.getId_product());
-        stmt.setString(3, sp.getSelling_price());
-        stmt.setInt(4, sp.getProducts_number());
-        stmt.setBoolean(5, sp.getPromotional_product());
-        stmt.setString(6, sp.getUPC());
-
-        return stmt.executeUpdate() > 0;
-    }
-
-    // відсортовані за кількістю (вимога менеджера №10)
-    public List<Store_Product> getAllStoreProductsSortedByQuantity() throws SQLException {
-        List<Store_Product> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM Store_Product ORDER BY products_number ASC";
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-
-        while (rs.next()) {
-            list.add(new Store_Product(
-                    rs.getString("upc"),
-                    rs.getString("upc_prom"),
-                    rs.getInt("id_product"),
-                    rs.getString("selling_price"),
-                    rs.getInt("products_number"),
-                    rs.getBoolean("promotional_product")
-            ));
+            list.add(mapStoreProduct(rs));
         }
         return list;
     }
 
-    // тільки акційні товари (вимога менеджера №15 і касира №12)
-    public List<Store_Product> getPromotionalProducts(String sortBy) throws SQLException {
+    // 3. Пошук АКЦІЙНИХ товарів (Вимога №15)
+    public List<Store_Product> getPromotionalProducts() throws SQLException {
         List<Store_Product> list = new ArrayList<>();
-
-        String order = sortBy.equals("name") ? "id_product ASC" : "products_number ASC";
-        String sql = "SELECT * FROM Store_Product WHERE promotional_product = true ORDER BY " + order;
+        // Тільки ті, де promotional_product = true
+        String sql = "SELECT * FROM Store_Product WHERE promotional_product = true ORDER BY products_number ASC";
 
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
-
         while (rs.next()) {
-            list.add(new Store_Product(
-                    rs.getString("upc"),
-                    rs.getString("upc_prom"),
-                    rs.getInt("id_product"),
-                    rs.getString("selling_price"),
-                    rs.getInt("products_number"),
-                    rs.getBoolean("promotional_product")
-            ));
+            list.add(mapStoreProduct(rs));
         }
         return list;
     }
 
-    // тільки не акційні товари (вимога менеджера №16 і касира №13)
-    public List<Store_Product> getNonPromotionalProducts(String sortBy) throws SQLException {
-        List<Store_Product> list = new ArrayList<>();
+    // 4. ПЕРЕОЦІНКА: Коли приходить нова партія (Вимога 2.1.2.1)
+    // Якщо ціна змінюється, вона змінюється для всіх одиниць цього товару
+    public void updateProductPrice(int idProduct, double newPrice) throws SQLException {
+        // Оновлюємо ціну для всіх звичайних товарів з цим ID
+        String sqlNormal = "UPDATE Store_Product SET selling_price = ? WHERE id_product = ? AND promotional_product = false";
+        // Оновлюємо ціну для акційних (нова ціна - 20%)
+        String sqlPromo = "UPDATE Store_Product SET selling_price = ? * 0.8 WHERE id_product = ? AND promotional_product = true";
 
-        String order = sortBy.equals("name") ? "id_product ASC" : "products_number ASC";
-        String sql = "SELECT * FROM Store_Product WHERE promotional_product = false ORDER BY " + order;
+        PreparedStatement st1 = connection.prepareStatement(sqlNormal);
+        st1.setDouble(1, newPrice);
+        st1.setInt(2, idProduct);
+        st1.executeUpdate();
 
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-
-        while (rs.next()) {
-            list.add(new Store_Product(
-                    rs.getString("upc"),
-                    rs.getString("upc_prom"),
-                    rs.getInt("id_product"),
-                    rs.getString("selling_price"),
-                    rs.getInt("products_number"),
-                    rs.getBoolean("promotional_product")
-            ));
-        }
-        return list;
+        PreparedStatement st2 = connection.prepareStatement(sqlPromo);
+        st2.setDouble(1, newPrice);
+        st2.setInt(2, idProduct);
+        st2.executeUpdate();
     }
 
-    // пошук за UPC (вимога менеджера №14 і касира №14)
-    public Store_Product getStoreProductByUPC(String upc) throws SQLException {
-        String sql = "SELECT * FROM Store_Product WHERE upc = ?";
-
-        PreparedStatement stmt = connection.prepareStatement(sql);
-        stmt.setString(1, upc);
-        ResultSet rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            return new Store_Product(
-                    rs.getString("upc"),
-                    rs.getString("upc_prom"),
-                    rs.getInt("id_product"),
-                    rs.getString("selling_price"),
-                    rs.getInt("products_number"),
-                    rs.getBoolean("promotional_product")
-            );
-        }
-        return null;
+    // Допоміжний метод, щоб не дублювати код створення об'єкта
+    private Store_Product mapStoreProduct(ResultSet rs) throws SQLException {
+        return new Store_Product(
+                rs.getString("upc"),
+                rs.getString("upc_prom"),
+                rs.getInt("id_product"),
+                String.valueOf(rs.getDouble("selling_price")),
+                rs.getInt("products_number"),
+                rs.getBoolean("promotional_product")
+        );
     }
 }

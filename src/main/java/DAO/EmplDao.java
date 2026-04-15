@@ -160,6 +160,61 @@ public class EmplDao {
                 rs.getString("zip_code")
         );
     }
+    //пошук за прізвищем
+    public List<Employee> getEmployeeBySurname(String surname) throws SQLException {
+        List<Employee> list = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE empl_surname = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, surname);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            list.add(new Employee(
+                    rs.getString("id_employee"),
+                    rs.getString("empl_surname"),
+                    rs.getString("empl_name"),
+                    rs.getString("empl_patronymic"),
+                    rs.getString("empl_role"),
+                    rs.getDouble("salary"),
+                    rs.getString("date_of_birth"),
+                    rs.getString("date_of_start"),
+                    rs.getString("phone_number"),
+                    rs.getString("city"),
+                    rs.getString("street"),
+                    rs.getString("zip_code")
+            ));
+        }
+        return list;
+    }
+    /**
+     * коли касир заходить у систему - має бачити свої дані
+     */
+    public Employee getEmployeeById(String id) throws SQLException {
+        String sql = "SELECT * FROM Employee WHERE id_employee = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, id);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return new Employee(
+                    rs.getString("id_employee"),
+                    rs.getString("empl_surname"),
+                    rs.getString("empl_name"),
+                    rs.getString("empl_patronymic"),
+                    rs.getString("empl_role"),
+                    rs.getDouble("salary"),
+                    rs.getString("date_of_birth"),
+                    rs.getString("date_of_start"),
+                    rs.getString("phone_number"),
+                    rs.getString("city"),
+                    rs.getString("street"),
+                    rs.getString("zip_code")
+            );
+        }
+        return null;
+    }
 }
 /**
  *
