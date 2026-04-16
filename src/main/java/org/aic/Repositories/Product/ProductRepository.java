@@ -1,7 +1,6 @@
-package org.aic.Repositories;
+package org.aic.Repositories.Product;
 
 import org.aic.DBModels.ProductDBModel;
-import org.aic.Storage.IStorageContext;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -57,6 +56,8 @@ public class ProductRepository implements IProductRepository {
 
     @Override
     public void saveNewProduct(ProductDBModel productDBModel) throws SQLException {
+        String newId = "EMP-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+
         String sql = "INSERT INTO product(category_number, product_name, producer, characteristics) VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setInt(1, productDBModel.getCategoryNumber());

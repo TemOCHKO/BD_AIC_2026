@@ -32,6 +32,14 @@ public class EmployeeDBModel {
         this.zip_code = zipcode;
     }
 
+    public EmployeeDBModel(String empl_surname, String empl_name,
+                           String empl_patronymic, String empl_role, double salary,
+                           String date_of_birth, String date_of_start, String phone_number,
+                           String city, String street, String zipcode) {
+        this("defaultId", empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zipcode);
+    }
+
+
     public String getId_employee() {
         return id_employee;
     }

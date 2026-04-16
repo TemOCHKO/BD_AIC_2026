@@ -1,4 +1,4 @@
-package org.aic.Services;
+package org.aic.Services.StoreProduct;
 
 import org.aic.DBModels.StoreProductDBModel;
 

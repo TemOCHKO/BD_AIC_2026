@@ -1,17 +1,12 @@
 package org.aic.UI.Controllers;
 
-import org.aic.DBModels.CategoryDBModel;
 import org.aic.DBModels.ProductDBModel;
-import org.aic.DTOModels.ProductTableDTO;
-import org.aic.ProductType;
-import org.aic.Services.ICategoryService;
-import org.aic.Services.IProductService;
+import org.aic.Services.Category.ICategoryService;
+import org.aic.Services.Product.IProductService;
 import org.aic.UI.Views.AddNewProductView;
 import org.aic.UI.Views.ProductView;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

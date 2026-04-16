@@ -1,13 +1,13 @@
-package org.aic.Services;
+package org.aic.Services.Category;
 
 import org.aic.DBModels.CategoryDBModel;
-import org.aic.Repositories.ICategoryRepository;
+import org.aic.Repositories.Category.ICategoryRepository;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-public class CategoryService implements ICategoryService{
+public class CategoryService implements ICategoryService {
 
     private final ICategoryRepository categoryRepository;
 

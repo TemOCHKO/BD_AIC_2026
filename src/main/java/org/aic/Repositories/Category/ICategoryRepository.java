@@ -1,4 +1,4 @@
-package org.aic.Repositories;
+package org.aic.Repositories.Category;
 
 import org.aic.DBModels.CategoryDBModel;
 

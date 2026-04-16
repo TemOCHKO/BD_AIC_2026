@@ -1,4 +1,4 @@
-package org.aic.Services;
+package org.aic.Services.Category;
 
 import org.aic.DBModels.CategoryDBModel;
 

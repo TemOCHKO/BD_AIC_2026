@@ -8,7 +8,6 @@ public class DataBaseConnection {
     private static final String URL = "jdbc:mysql://127.0.0.1:3306/bd_aic_2026";
     private static final String USER = "root";
     private static final String PASSWORD = "tema_bro_8474";
-
     private static Connection connection = null;
 
     public static Connection getConnection() throws SQLException {

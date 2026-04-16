@@ -1,10 +1,9 @@
-package org.aic.Repositories;
+package org.aic.Repositories.Product;
 
 import org.aic.DBModels.ProductDBModel;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 public interface IProductRepository {
     List<ProductDBModel> getAllProducts() throws SQLException;

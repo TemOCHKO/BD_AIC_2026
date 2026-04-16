@@ -1,8 +1,7 @@
-package org.aic.Services;
+package org.aic.Services.StoreProduct;
 
 import org.aic.DBModels.StoreProductDBModel;
-import org.aic.Repositories.IStoreProductRepository;
-import org.aic.Repositories.StoreProductRepository;
+import org.aic.Repositories.StoreProduct.IStoreProductRepository;
 
 public class StoreProductService implements IStoreProductService {
 

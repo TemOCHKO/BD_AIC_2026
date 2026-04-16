@@ -1,4 +1,4 @@
-package org.aic.Services;
+package org.aic.Services.Product;
 
 import org.aic.DBModels.ProductDBModel;
 import org.aic.DTOModels.ProductTableDTO;

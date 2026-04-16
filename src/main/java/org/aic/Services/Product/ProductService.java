@@ -1,15 +1,15 @@
-package org.aic.Services;
+package org.aic.Services.Product;
 
 import org.aic.DBModels.ProductDBModel;
 import org.aic.DTOModels.ProductTableDTO;
-import org.aic.Repositories.ICategoryRepository;
-import org.aic.Repositories.IProductRepository;
+import org.aic.Repositories.Category.ICategoryRepository;
+import org.aic.Repositories.Product.IProductRepository;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ProductService implements IProductService{
+public class ProductService implements IProductService {
     private final IProductRepository productRepository;
     private final ICategoryRepository categoryRepository;
 

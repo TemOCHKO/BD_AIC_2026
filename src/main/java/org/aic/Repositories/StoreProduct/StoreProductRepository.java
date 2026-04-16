@@ -1,4 +1,4 @@
-package org.aic.Repositories;
+package org.aic.Repositories.StoreProduct;
 
 import org.aic.DBModels.StoreProductDBModel;
 import org.aic.Storage.IStorageContext;
