@@ -88,10 +88,10 @@ public class AddNewProductView extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 30));
         buttonPanel.setBackground(bgColor);
 
-        saveButton = new JButton("Зберегти");
+        saveButton = new RoundedButton("Зберегти", 48);
         styleButton(saveButton, new Color(85, 85, 85), Color.WHITE); // Dark gray
 
-        cancelButton = new JButton("Скасувати");
+        cancelButton = new RoundedButton("Скасувати", 48);
         styleButton(cancelButton, new Color(230, 230, 230), Color.DARK_GRAY); // Light gray
 
         buttonPanel.add(saveButton);
@@ -125,7 +125,8 @@ public class AddNewProductView extends JFrame {
     }
 
     private JTextField createStyledTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new RoundedTextField(48);
+
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35)); // Force height, allow wide expansion
         field.setBackground(new Color(180, 180, 180)); // Match the gray input box color
         field.setBorder(new EmptyBorder(5, 10, 5, 10)); // Inner padding

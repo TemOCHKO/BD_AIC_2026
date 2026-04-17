@@ -28,8 +28,8 @@ public class ProductView extends JFrame {
 
         // Setup Button Panel
         JPanel bottomPanel = new JPanel();
-        loadDataButton = new JButton("Load Products");
-        createNewProductButton = new JButton("Create New Product");
+        loadDataButton = new RoundedButton("Load Products", 48);
+        createNewProductButton = new RoundedButton("Create New Product", 48);
         bottomPanel.add(loadDataButton);
         bottomPanel.add(createNewProductButton);
         add(bottomPanel, BorderLayout.SOUTH);
