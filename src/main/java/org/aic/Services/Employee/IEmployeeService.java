@@ -13,5 +13,5 @@ public interface IEmployeeService {
     EmployeeDBModel getEmployeeBySurname(String name);
     EmployeeDBModel getEmployeeById(String id);
     void saveNewEmployee(EmployeeDBModel employeeDBModel);
-    void updateEmployee(List<Object> properties);
+    void updateEmployee(EmployeeDBModel employeeDBModel);
 }

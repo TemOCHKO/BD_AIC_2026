@@ -66,8 +66,12 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public void updateEmployee(List<Object> properties) {
-
+    public void updateEmployee(EmployeeDBModel employeeDBModel) {
+        try {
+            employeeRepository.updateEmployee(employeeDBModel);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

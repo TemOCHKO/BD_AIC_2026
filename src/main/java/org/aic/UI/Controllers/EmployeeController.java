@@ -18,12 +18,14 @@ public class EmployeeController {
     private final AddEmployeeView addEmployeeView;
     private final EditEmployeeView editEmployeeView;
     private final IEmployeeService employeeService;
+    private EmployeeDBModel currentEmployee;
 
     public EmployeeController(IEmployeeService employeeService) {
         this.employeeService = employeeService;
         this.listView = new EmployeesListView();
         this.addEmployeeView = new AddEmployeeView();
         this.editEmployeeView = new EditEmployeeView();
+        currentEmployee = null;
 
         initController();
         prepareToShow(listView);
@@ -52,7 +54,96 @@ public class EmployeeController {
     }
 
     private void updateEmployee() {
-        employeeService.updateEmployee(new ArrayList<>());
+        if (editEmployeeView.getSurnameField().getText().isEmpty() || editEmployeeView.getSurnameField().getText() == null) {
+            showInputErrorMessage("Please enter a surname");
+            return;
+        } else if (editEmployeeView.getNameField().getText().isEmpty() || editEmployeeView.getNameField().getText() == null) {
+            showInputErrorMessage("Please enter a name");
+            return;
+        } else if (editEmployeeView.getPatronymicField().getText().isEmpty() || editEmployeeView.getPatronymicField().getText() == null) {
+            showInputErrorMessage("Please enter a patronymic");
+            return;
+        } else if (editEmployeeView.getRoleField().getText().isEmpty() || editEmployeeView.getRoleField().getText() == null) {
+            showInputErrorMessage("Please enter a role");
+            return;
+        } else if (editEmployeeView.getSalaryField().getText().isEmpty() || editEmployeeView.getSalaryField().getText() == null) {
+            showInputErrorMessage("Please enter a salary");
+            return;
+        } else if (editEmployeeView.getDobField().getText().isEmpty() || editEmployeeView.getDobField().getText() == null) {
+            showInputErrorMessage("Please enter a date of birth");
+            return;
+        } else if (editEmployeeView.getDosField().getText().isEmpty() || editEmployeeView.getDosField().getText() == null) {
+            showInputErrorMessage("Please enter a date of start");
+            return;
+        } else if (editEmployeeView.getPhoneField().getText().isEmpty() || editEmployeeView.getPhoneField().getText() == null) {
+            showInputErrorMessage("Please enter a phone number");
+            return;
+        } else if (editEmployeeView.getCityField().getText().isEmpty() || editEmployeeView.getCityField().getText() == null) {
+            showInputErrorMessage("Please enter a city");
+            return;
+        } else if (editEmployeeView.getStreetField().getText().isEmpty() || editEmployeeView.getStreetField().getText() == null) {
+            showInputErrorMessage("Please enter a street");
+            return;
+        } else if (editEmployeeView.getZipField().getText().isEmpty() || editEmployeeView.getZipField().getText() == null) {
+            showInputErrorMessage("Please enter a zip code");
+            return;
+        }
+
+        double salary;
+        try {
+            salary = Double.parseDouble(editEmployeeView.getSalaryField().getText().trim());
+        } catch (NumberFormatException e) {
+            showInputErrorMessage("Please enter a valid salary");
+            return;
+        }
+
+        if (isIllegalStringLength(editEmployeeView.getSurnameField().getText(), 50)) {
+            showInputErrorMessage("Surname cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getNameField().getText(), 50)) {
+            showInputErrorMessage("Name cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getPatronymicField().getText(), 50)) {
+            showInputErrorMessage("Patronymic cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getRoleField().getText(), 10)) {
+            showInputErrorMessage("Name cant be bigger than " + 10 + " characters");
+            return;
+        } else if (editEmployeeView.getDobField().getDate().isAfter(LocalDate.now().minusYears(18))) {
+            showInputErrorMessage("Employee cant be younger than " + 18 + " years old");
+            return;
+        } else if (editEmployeeView.getDosField().getDate().isAfter(addEmployeeView.getDobField().getDate())) {
+            showInputErrorMessage("Employee cant have started working before being born");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getPhoneField().getText(), 13)) {
+            showInputErrorMessage("Phone number cant be bigger than " + 13 + " characters");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getCityField().getText(), 50)) {
+            showInputErrorMessage("City cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(editEmployeeView.getStreetField().getText(), 50)) {
+            showInputErrorMessage("Street cant be bigger than " + 50 + " characters");
+            return;
+        }  else if (isIllegalStringLength(editEmployeeView.getZipField().getText(), 9)) {
+            showInputErrorMessage("Zip Code cant be bigger than " + 9 + " characters");
+            return;
+        }
+
+        employeeService.updateEmployee(new EmployeeDBModel(currentEmployee.getId_employee(), editEmployeeView.getSurnameField().getText(),
+                editEmployeeView.getNameField().getText().trim(),
+                editEmployeeView.getPatronymicField().getText().trim(),
+                editEmployeeView.getRoleField().getText().trim(),
+                salary,
+                convertToDBDateString(editEmployeeView.getDobField()),
+                convertToDBDateString(editEmployeeView.getDosField()),
+                editEmployeeView.getPhoneField().getText().trim(),
+                editEmployeeView.getCityField().getText().trim(),
+                editEmployeeView.getStreetField().getText().trim(),
+                editEmployeeView.getZipField().getText().trim()
+        ));
+
+        loadData();
+        goBack(editEmployeeView);
     }
 
     private void goToAddNewEmployeeView() {
@@ -115,12 +206,43 @@ public class EmployeeController {
 
         double salary;
         try {
-            salary = Integer.parseInt(addEmployeeView.getSalaryField().getText().trim());
+            salary = Double.parseDouble(addEmployeeView.getSalaryField().getText().trim());
         } catch (NumberFormatException e) {
             showInputErrorMessage("Please enter a valid salary");
             return;
         }
 
+        if (isIllegalStringLength(addEmployeeView.getSurnameField().getText(), 50)) {
+            showInputErrorMessage("Surname cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getNameField().getText(), 50)) {
+            showInputErrorMessage("Name cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getPatronymicField().getText(), 50)) {
+            showInputErrorMessage("Patronymic cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getRoleField().getText(), 10)) {
+            showInputErrorMessage("Name cant be bigger than " + 10 + " characters");
+            return;
+        } else if (addEmployeeView.getDobField().getDate().isAfter(LocalDate.now().minusYears(18))) {
+            showInputErrorMessage("Employee cant be younger than " + 18 + " years old");
+            return;
+        } else if (!addEmployeeView.getDosField().getDate().isAfter(addEmployeeView.getDobField().getDate())) {
+            showInputErrorMessage("Employee cant have started working before being born");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getPhoneField().getText(), 13)) {
+            showInputErrorMessage("Phone number cant be bigger than " + 13 + " characters");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getCityField().getText(), 50)) {
+            showInputErrorMessage("City cant be bigger than " + 50 + " characters");
+            return;
+        } else if (isIllegalStringLength(addEmployeeView.getStreetField().getText(), 50)) {
+            showInputErrorMessage("Street cant be bigger than " + 50 + " characters");
+            return;
+        }  else if (isIllegalStringLength(addEmployeeView.getZipField().getText(), 9)) {
+            showInputErrorMessage("Zip Code cant be bigger than " + 9 + " characters");
+            return;
+        }
 
         employeeService.saveNewEmployee(new EmployeeDBModel(addEmployeeView.getSurnameField().getText(),
                 addEmployeeView.getNameField().getText().trim(),
@@ -139,8 +261,12 @@ public class EmployeeController {
         goBack(addEmployeeView);
     }
 
-    private void validateDataInFields() throws IllegalArgumentException {
-        
+    private boolean isIllegalStringLength(String s, int maxLength) {
+        s = s.trim();
+        if (s.length() > maxLength) {
+            return true;
+        }
+        return false;
     }
 
     private void showInputErrorMessage(String errorMessage) {
@@ -165,25 +291,25 @@ public class EmployeeController {
     }
 
     private void fetchData(int rowNumber) {
-        EmployeeDBModel employeeDBModel = employeeService.getEmployeeBySurname(listView.getEmployeeTable().getValueAt(rowNumber, 1).toString().trim());
+        currentEmployee = employeeService.getEmployeeBySurname(listView.getEmployeeTable().getValueAt(rowNumber, 1).toString().trim());
 
         LocalDate dob;
         try {
-            dob = convertFromDBDateString(employeeDBModel.getDate_of_birth());
+            dob = convertFromDBDateString(currentEmployee.getDate_of_birth());
         } catch (Exception e) {
             dob = LocalDate.now();
         }
 
         LocalDate dos;
         try {
-            dos = convertFromDBDateString(employeeDBModel.getDate_of_start());
+            dos = convertFromDBDateString(currentEmployee.getDate_of_start());
         } catch (Exception e) {
             dos = LocalDate.now();
         }
 
-        editEmployeeView.setEmployeeData(employeeDBModel.getEmpl_surname(), employeeDBModel.getEmpl_name(), employeeDBModel.getEmpl_patronymic()
-                , employeeDBModel.getEmpl_role(), employeeDBModel.getSalary() + "", dob, dos, employeeDBModel.getPhone_number()
-                , employeeDBModel.getCity(), employeeDBModel.getStreet(), employeeDBModel.getZip_code());
+        editEmployeeView.setEmployeeData(currentEmployee.getEmpl_surname(), currentEmployee.getEmpl_name(), currentEmployee.getEmpl_patronymic()
+                , currentEmployee.getEmpl_role(), currentEmployee.getSalary() + "", dob, dos, currentEmployee.getPhone_number()
+                , currentEmployee.getCity(), currentEmployee.getStreet(), currentEmployee.getZip_code());
     }
 
 }
