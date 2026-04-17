@@ -7,6 +7,7 @@ import org.aic.Repositories.Employee.IEmployeeRepository;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeService implements IEmployeeService {
 
@@ -62,6 +63,11 @@ public class EmployeeService implements IEmployeeService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void updateEmployee(List<Object> properties) {
+
     }
 
 

@@ -97,7 +97,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setString(1, surname);
-        ResultSet rs = stmt.executeQuery(sql);
+        ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
             return mapEmployee(rs);

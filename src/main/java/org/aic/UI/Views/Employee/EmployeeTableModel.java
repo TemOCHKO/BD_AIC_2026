@@ -9,7 +9,7 @@ import java.util.List;
 
 public class EmployeeTableModel extends AbstractTableModel {
     // 1. Define the column headers
-    private String[] columnNames = {"Surname", "Name", "Role", "Date of Birth"};
+    private String[] columnNames = {"ID", "Surname", "Name", "Role", "Date of Birth"};
     private List<EmployeeListDTO> employees;
 
     public EmployeeTableModel() {
@@ -24,6 +24,11 @@ public class EmployeeTableModel extends AbstractTableModel {
     }
 
     @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    @Override
     public int getRowCount() {
         return employees.size();
     }
@@ -35,13 +40,14 @@ public class EmployeeTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        EmployeeListDTO product = employees.get(rowIndex);
+        EmployeeListDTO employee = employees.get(rowIndex);
 
         return switch (columnIndex) {
-            case 0 -> product.getId().toString().substring(0, 4);
-            case 1 -> product.getName();
-            case 2 -> product.getRole();
-            case 3 -> product.getDateOfBirth();
+            case 0 -> employee.getId().toString().substring(0, 4);
+            case 1 -> employee.getSurname();
+            case 2 -> employee.getName();
+            case 3 -> employee.getRole();
+            case 4 -> employee.getDateOfBirth();
             default -> null;
         };
     }

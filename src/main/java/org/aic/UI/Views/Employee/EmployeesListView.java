@@ -11,6 +11,7 @@ import java.util.List;
 public class EmployeesListView extends JFrame {
 
     private final EmployeeTableModel tableModel;
+    private final JTable employeeTable;
     private final JButton loadDataButton;
     private final JButton createNewEmployeeButton;
 
@@ -25,10 +26,12 @@ public class EmployeesListView extends JFrame {
         tableModel = new EmployeeTableModel();
 
         // 4. Create the JTable with the model
-        JTable employeeTable = new JTable(tableModel);
+        employeeTable = new JTable(tableModel);
 
         // Make the table read-only (so users can't edit cells directly)
         employeeTable.setDefaultEditor(Object.class, null);
+
+        employeeTable.getTableHeader().setReorderingAllowed(false);
 
         // ---> HERE IS THE SINGLE SELECTION RULE <---
         // Restrict the table so the user can only select one employee at a time
@@ -59,6 +62,7 @@ public class EmployeesListView extends JFrame {
     }
 
     public EmployeeTableModel getTableModel() { return tableModel; }
+    public JTable getEmployeeTable() { return  employeeTable; }
 
     public JButton getLoadDataButton() { return loadDataButton; }
     public JButton getCreateNewEmployeeButton() { return createNewEmployeeButton; }

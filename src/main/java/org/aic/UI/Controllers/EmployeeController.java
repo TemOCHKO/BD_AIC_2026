@@ -3,20 +3,28 @@ import com.github.lgooddatepicker.components.DatePicker;
 import org.aic.DBModels.EmployeeDBModel;
 import org.aic.Services.Employee.IEmployeeService;
 import org.aic.UI.Views.Employee.AddEmployeeView;
+import org.aic.UI.Views.Employee.EditEmployeeView;
 import org.aic.UI.Views.Employee.EmployeesListView;
 
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class EmployeeController {
 
     private final EmployeesListView listView;
     private final AddEmployeeView addEmployeeView;
+    private final EditEmployeeView editEmployeeView;
     private final IEmployeeService employeeService;
 
-    public EmployeeController(IEmployeeService employeeService, EmployeesListView listView, AddEmployeeView addEmployeeView) {
+    public EmployeeController(IEmployeeService employeeService) {
         this.employeeService = employeeService;
-        this.listView = listView;
-        this.addEmployeeView = addEmployeeView;
+        this.listView = new EmployeesListView();
+        this.addEmployeeView = new AddEmployeeView();
+        this.editEmployeeView = new EditEmployeeView();
+
         initController();
         prepareToShow(listView);
     }
@@ -24,9 +32,27 @@ public class EmployeeController {
     private void initController() {
         listView.getLoadDataButton().addActionListener(e -> loadData());
         listView.getCreateNewEmployeeButton().addActionListener(e -> goToAddNewEmployeeView());
-        //listView.getTableModel().addTableModelListener(e -> );
-        addEmployeeView.getCancelButton().addActionListener(e -> goBack());
+        listView.getEmployeeTable().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = listView.getEmployeeTable().getSelectedRow();
+
+                if (selectedRow >= 0) {
+                    if (e.getClickCount() >= 2) {
+                        fetchData(selectedRow);
+                        prepareToShow(editEmployeeView);
+                    }
+                }
+            }
+        });
+        addEmployeeView.getCancelButton().addActionListener(e -> goBack(addEmployeeView));
         addEmployeeView.getSaveButton().addActionListener(e -> saveNewEmployee());
+        editEmployeeView.getCancelButton().addActionListener(e -> goBack(editEmployeeView));
+        editEmployeeView.getUpdateButton().addActionListener(e -> updateEmployee());
+    }
+
+    private void updateEmployee() {
+        employeeService.updateEmployee(new ArrayList<>());
     }
 
     private void goToAddNewEmployeeView() {
@@ -39,8 +65,8 @@ public class EmployeeController {
         view.setVisible(true);
     }
 
-    private void goBack() {
-        cancelShowing(addEmployeeView);
+    private void goBack(JFrame view) {
+        cancelShowing(view);
     }
 
     private void cancelShowing(JFrame view) {
@@ -110,7 +136,11 @@ public class EmployeeController {
                 ));
 
         loadData();
-        goBack();
+        goBack(addEmployeeView);
+    }
+
+    private void validateDataInFields() throws IllegalArgumentException {
+        
     }
 
     private void showInputErrorMessage(String errorMessage) {
@@ -127,6 +157,33 @@ public class EmployeeController {
         sb.append(picker.getDate().getDayOfMonth());
 
         return sb.toString().trim();
+    }
+
+    private LocalDate convertFromDBDateString(String dbDateString) throws ArrayIndexOutOfBoundsException, NumberFormatException {
+        String[] dates = dbDateString.split("-");
+        return LocalDate.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]), Integer.parseInt(dates[2]));
+    }
+
+    private void fetchData(int rowNumber) {
+        EmployeeDBModel employeeDBModel = employeeService.getEmployeeBySurname(listView.getEmployeeTable().getValueAt(rowNumber, 1).toString().trim());
+
+        LocalDate dob;
+        try {
+            dob = convertFromDBDateString(employeeDBModel.getDate_of_birth());
+        } catch (Exception e) {
+            dob = LocalDate.now();
+        }
+
+        LocalDate dos;
+        try {
+            dos = convertFromDBDateString(employeeDBModel.getDate_of_start());
+        } catch (Exception e) {
+            dos = LocalDate.now();
+        }
+
+        editEmployeeView.setEmployeeData(employeeDBModel.getEmpl_surname(), employeeDBModel.getEmpl_name(), employeeDBModel.getEmpl_patronymic()
+                , employeeDBModel.getEmpl_role(), employeeDBModel.getSalary() + "", dob, dos, employeeDBModel.getPhone_number()
+                , employeeDBModel.getCity(), employeeDBModel.getStreet(), employeeDBModel.getZip_code());
     }
 
 }

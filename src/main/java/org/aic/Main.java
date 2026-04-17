@@ -53,10 +53,7 @@ public class Main {
             // 2. Controller
             //ProductController controller = new ProductController(view, addView, productService, categoryService);
 
-            EmployeesListView listView = new EmployeesListView();
-            AddEmployeeView addEmployeeView = new AddEmployeeView();
-
-            EmployeeController employeeController = new EmployeeController(employeeService, listView, addEmployeeView);
+            EmployeeController employeeController = new EmployeeController(employeeService);
             /*
             // 3. Show the View
             view.setLocationRelativeTo(null);
