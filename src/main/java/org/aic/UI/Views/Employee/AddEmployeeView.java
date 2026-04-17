@@ -8,9 +8,12 @@ import java.util.UUID;
 
 public class AddEmployeeView extends JFrame {
 
-    private JTextField surnameField, nameField, patronymicField, roleField;
+    private static String[] ROLES = { "Manager", "Cashier" };
+
+    private JTextField surnameField, nameField, patronymicField;
     private JTextField salaryField, phoneField, cityField, streetField, zipField;
     private DatePicker dobField, dosField;
+    private JComboBox<String> roleSelectorField;
     private JButton saveButton, cancelButton;
 
     public AddEmployeeView() {
@@ -29,7 +32,7 @@ public class AddEmployeeView extends JFrame {
         surnameField = new JTextField();
         nameField = new JTextField();
         patronymicField = new JTextField();
-        roleField = new JTextField();
+        roleSelectorField = new JComboBox<>(ROLES);
         salaryField = new JTextField();
 
         dobField = new DatePicker();
@@ -46,7 +49,8 @@ public class AddEmployeeView extends JFrame {
         addField(formPanel, "Surname:", surnameField);
         addField(formPanel, "Name:", nameField);
         addField(formPanel, "Patronymic:", patronymicField);
-        addField(formPanel, "Role:", roleField);
+        //addField(formPanel, "Role:", roleField);
+        addField(formPanel, "Role Selector", roleSelectorField);
         addField(formPanel, "Salary:", salaryField);
         addField(formPanel, "Date of Birth", dobField);
         addField(formPanel, "Date of Start", dosField);
@@ -79,13 +83,18 @@ public class AddEmployeeView extends JFrame {
         panel.add(datePicker);
     }
 
+    private void addField(JPanel panel, String labelText, JComboBox<String> comboBox) {
+        panel.add(new JLabel(labelText));
+        panel.add(comboBox);
+    }
+
     public DatePicker getDobField() { return dobField; }
     public DatePicker getDosField() { return dosField; }
 
     public JTextField getSurnameField() { return surnameField; }
     public JTextField getNameField() { return nameField; }
     public JTextField getPatronymicField() { return patronymicField; }
-    public JTextField getRoleField() { return roleField; }
+    public JComboBox<String> getRoleField() { return roleSelectorField; }
     public JTextField getSalaryField() { return salaryField; }
     public JTextField getPhoneField() { return phoneField; }
     public JTextField getCityField() { return cityField; }

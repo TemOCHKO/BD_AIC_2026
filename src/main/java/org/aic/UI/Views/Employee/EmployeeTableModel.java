@@ -43,6 +43,7 @@ public class EmployeeTableModel extends AbstractTableModel {
         EmployeeListDTO employee = employees.get(rowIndex);
 
         return switch (columnIndex) {
+            case -1 -> employee.getDbIdEmployee();
             case 0 -> employee.getId().toString().substring(0, 4);
             case 1 -> employee.getSurname();
             case 2 -> employee.getName();

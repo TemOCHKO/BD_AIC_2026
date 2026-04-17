@@ -74,5 +74,14 @@ public class EmployeeService implements IEmployeeService {
         }
     }
 
+    @Override
+    public void deleteEmployee(String id) {
+        try {
+            employeeRepository.deleteEmployee(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

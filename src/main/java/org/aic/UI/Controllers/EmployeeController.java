@@ -47,10 +47,25 @@ public class EmployeeController {
                 }
             }
         });
+        listView.getDeleteEmployee().addActionListener(e -> deleteEmployee());
         addEmployeeView.getCancelButton().addActionListener(e -> goBack(addEmployeeView));
         addEmployeeView.getSaveButton().addActionListener(e -> saveNewEmployee());
         editEmployeeView.getCancelButton().addActionListener(e -> goBack(editEmployeeView));
         editEmployeeView.getUpdateButton().addActionListener(e -> updateEmployee());
+    }
+
+    private void deleteEmployee() {
+        int selectedRow = listView.getEmployeeTable().getSelectedRow();
+
+        if (selectedRow < 0) {
+            showInputErrorMessage("Please select which employee to delete");
+            return;
+        }
+
+        employeeService.deleteEmployee(listView.getEmployeeTable().getValueAt(selectedRow, -1).toString().trim());
+        showMessage("Successfully deleted " + listView.getEmployeeTable().getValueAt(selectedRow, 1));
+
+        loadData();
     }
 
     private void updateEmployee() {
@@ -63,7 +78,7 @@ public class EmployeeController {
         } else if (editEmployeeView.getPatronymicField().getText().isEmpty() || editEmployeeView.getPatronymicField().getText() == null) {
             showInputErrorMessage("Please enter a patronymic");
             return;
-        } else if (editEmployeeView.getRoleField().getText().isEmpty() || editEmployeeView.getRoleField().getText() == null) {
+        } else if (editEmployeeView.getRoleField().getSelectedItem() == null || editEmployeeView.getRoleField().getSelectedItem().toString().trim().isEmpty()) {
             showInputErrorMessage("Please enter a role");
             return;
         } else if (editEmployeeView.getSalaryField().getText().isEmpty() || editEmployeeView.getSalaryField().getText() == null) {
@@ -106,13 +121,13 @@ public class EmployeeController {
         } else if (isIllegalStringLength(editEmployeeView.getPatronymicField().getText(), 50)) {
             showInputErrorMessage("Patronymic cant be bigger than " + 50 + " characters");
             return;
-        } else if (isIllegalStringLength(editEmployeeView.getRoleField().getText(), 10)) {
+        } else if (isIllegalStringLength(editEmployeeView.getRoleField().getSelectedItem().toString(), 10)) {
             showInputErrorMessage("Name cant be bigger than " + 10 + " characters");
             return;
         } else if (editEmployeeView.getDobField().getDate().isAfter(LocalDate.now().minusYears(18))) {
             showInputErrorMessage("Employee cant be younger than " + 18 + " years old");
             return;
-        } else if (editEmployeeView.getDosField().getDate().isAfter(addEmployeeView.getDobField().getDate())) {
+        } else if (!editEmployeeView.getDosField().getDate().isAfter(addEmployeeView.getDobField().getDate())) {
             showInputErrorMessage("Employee cant have started working before being born");
             return;
         } else if (isIllegalStringLength(editEmployeeView.getPhoneField().getText(), 13)) {
@@ -132,7 +147,7 @@ public class EmployeeController {
         employeeService.updateEmployee(new EmployeeDBModel(currentEmployee.getId_employee(), editEmployeeView.getSurnameField().getText(),
                 editEmployeeView.getNameField().getText().trim(),
                 editEmployeeView.getPatronymicField().getText().trim(),
-                editEmployeeView.getRoleField().getText().trim(),
+                editEmployeeView.getRoleField().getSelectedItem().toString().trim(),
                 salary,
                 convertToDBDateString(editEmployeeView.getDobField()),
                 convertToDBDateString(editEmployeeView.getDosField()),
@@ -142,6 +157,7 @@ public class EmployeeController {
                 editEmployeeView.getZipField().getText().trim()
         ));
 
+        currentEmployee = null;
         loadData();
         goBack(editEmployeeView);
     }
@@ -178,7 +194,7 @@ public class EmployeeController {
         } else if (addEmployeeView.getPatronymicField().getText().isEmpty() || addEmployeeView.getPatronymicField().getText() == null) {
             showInputErrorMessage("Please enter a patronymic");
             return;
-        } else if (addEmployeeView.getRoleField().getText().isEmpty() || addEmployeeView.getRoleField().getText() == null) {
+        } else if (addEmployeeView.getRoleField().getSelectedItem() == null || addEmployeeView.getRoleField().getSelectedItem().toString().trim().isEmpty()) {
             showInputErrorMessage("Please enter a role");
             return;
         } else if (addEmployeeView.getSalaryField().getText().isEmpty() || addEmployeeView.getSalaryField().getText() == null) {
@@ -221,7 +237,7 @@ public class EmployeeController {
         } else if (isIllegalStringLength(addEmployeeView.getPatronymicField().getText(), 50)) {
             showInputErrorMessage("Patronymic cant be bigger than " + 50 + " characters");
             return;
-        } else if (isIllegalStringLength(addEmployeeView.getRoleField().getText(), 10)) {
+        } else if (isIllegalStringLength(addEmployeeView.getRoleField().getSelectedItem().toString(), 10)) {
             showInputErrorMessage("Name cant be bigger than " + 10 + " characters");
             return;
         } else if (addEmployeeView.getDobField().getDate().isAfter(LocalDate.now().minusYears(18))) {
@@ -247,7 +263,7 @@ public class EmployeeController {
         employeeService.saveNewEmployee(new EmployeeDBModel(addEmployeeView.getSurnameField().getText(),
                 addEmployeeView.getNameField().getText().trim(),
                 addEmployeeView.getPatronymicField().getText().trim(),
-                addEmployeeView.getRoleField().getText().trim(),
+                addEmployeeView.getRoleField().getSelectedItem().toString().trim(),
                 salary,
                 convertToDBDateString(addEmployeeView.getDobField()),
                 convertToDBDateString(addEmployeeView.getDosField()),
@@ -274,6 +290,13 @@ public class EmployeeController {
                  errorMessage,
                 "Input Error",
                  JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(addEmployeeView,
+                message,
+                "",
+                JOptionPane.PLAIN_MESSAGE);
     }
 
     private String convertToDBDateString(DatePicker picker) {

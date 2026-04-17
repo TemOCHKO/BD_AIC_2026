@@ -25,4 +25,8 @@ public class EmployeeListDTO {
     public String getName() { return name; }
     public String getRole() { return role; }
     public String getDateOfBirth() { return dateOfBirth; }
+
+    public String getDbIdEmployee() {
+        return dbIdEmployee;
+    }
 }

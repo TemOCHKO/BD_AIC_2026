@@ -5,6 +5,7 @@ import org.aic.DBModels.ProductDBModel;
 import org.aic.DTOModels.Employee.EmployeeListDTO;
 import org.aic.DTOModels.ProductTableDTO;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface IEmployeeService {
@@ -14,4 +15,5 @@ public interface IEmployeeService {
     EmployeeDBModel getEmployeeById(String id);
     void saveNewEmployee(EmployeeDBModel employeeDBModel);
     void updateEmployee(EmployeeDBModel employeeDBModel);
+    void deleteEmployee(String id);
 }

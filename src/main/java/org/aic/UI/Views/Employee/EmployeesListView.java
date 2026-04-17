@@ -14,7 +14,7 @@ public class EmployeesListView extends JFrame {
     private final JTable employeeTable;
     private final JButton loadDataButton;
     private final JButton createNewEmployeeButton;
-
+    private final JButton deleteEmployee;
     public EmployeesListView() {
         // Set up the main window
         setTitle("Employee Directory");
@@ -56,8 +56,10 @@ public class EmployeesListView extends JFrame {
         JPanel bottomPanel = new JPanel();
         loadDataButton = new JButton("Load employees");
         createNewEmployeeButton = new JButton("Create New Employee");
+        deleteEmployee = new JButton("Delete Employee");
         bottomPanel.add(loadDataButton);
         bottomPanel.add(createNewEmployeeButton);
+        bottomPanel.add(deleteEmployee);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
@@ -66,6 +68,7 @@ public class EmployeesListView extends JFrame {
 
     public JButton getLoadDataButton() { return loadDataButton; }
     public JButton getCreateNewEmployeeButton() { return createNewEmployeeButton; }
+    public JButton getDeleteEmployee() { return deleteEmployee; }
 
     public void displayEmployees(Iterable<EmployeeListDTO> employees) {
         tableModel.setProducts((List<EmployeeListDTO>) employees);

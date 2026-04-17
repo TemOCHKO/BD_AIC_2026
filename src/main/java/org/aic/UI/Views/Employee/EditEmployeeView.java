@@ -8,9 +8,12 @@ import java.time.LocalDate;
 
 public class EditEmployeeView extends JFrame {
 
+    private static String[] ROLES = {"Manager", "Cashier"};
+
     // Added idField for the Edit View
     private JTextField surnameField, nameField, patronymicField, roleField;
     private JTextField salaryField, phoneField, cityField, streetField, zipField;
+    private JComboBox<String> roleSelectorField;
     private DatePicker dobField, dosField;
     private JButton updateButton, cancelButton;
 
@@ -30,6 +33,7 @@ public class EditEmployeeView extends JFrame {
         nameField = new JTextField();
         patronymicField = new JTextField();
         roleField = new JTextField();
+        roleSelectorField = new JComboBox<>(ROLES);
         salaryField = new JTextField();
 
         dobField = new DatePicker();
@@ -44,7 +48,8 @@ public class EditEmployeeView extends JFrame {
         addField(formPanel, "Surname:", surnameField);
         addField(formPanel, "Name:", nameField);
         addField(formPanel, "Patronymic:", patronymicField);
-        addField(formPanel, "Role:", roleField);
+        // addField(formPanel, "Role:", roleField);
+        addField(formPanel, "Role Selector", roleSelectorField);
         addField(formPanel, "Salary:", salaryField);
         addField(formPanel, "Date of Birth:", dobField);
         addField(formPanel, "Date of Start:", dosField);
@@ -77,6 +82,12 @@ public class EditEmployeeView extends JFrame {
         panel.add(datePicker);
     }
 
+    private void addField(JPanel panel, String labelText, JComboBox<String> comboBox) {
+        panel.add(new JLabel(labelText));
+        panel.add(comboBox);
+    }
+
+
     // ==========================================
     // DATA POPULATION METHOD (For the Controller)
     // ==========================================
@@ -86,7 +97,7 @@ public class EditEmployeeView extends JFrame {
         surnameField.setText(surname);
         nameField.setText(name);
         patronymicField.setText(patronymic);
-        roleField.setText(role);
+        roleSelectorField.setSelectedItem(role);
         salaryField.setText(salary);
 
         if (dob != null) dobField.setDate(dob);
@@ -106,7 +117,7 @@ public class EditEmployeeView extends JFrame {
     public JTextField getSurnameField() { return surnameField; }
     public JTextField getNameField() { return nameField; }
     public JTextField getPatronymicField() { return patronymicField; }
-    public JTextField getRoleField() { return roleField; }
+    public JComboBox<String> getRoleField() { return roleSelectorField; }
     public JTextField getSalaryField() { return salaryField; }
     public JTextField getPhoneField() { return phoneField; }
     public JTextField getCityField() { return cityField; }
