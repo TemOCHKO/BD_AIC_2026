@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 
-public class ManagerFrame extends JFrame {
+public class CashierFrame extends JFrame {
 
     // ── Colors ────────────────────────────────────────────────────
     private static final Color BG_DARK    = new Color(0x2B2B2B);
@@ -22,77 +22,71 @@ public class ManagerFrame extends JFrame {
     private static final Color BTN_DARK   = new Color(0x3A3A3A);
     private static final Color BTN_LIGHT  = new Color(0xE0E0E0);
     private static final Color BTN_ACCENT = new Color(0x555555);
+    private static final Color BTN_GREEN  = new Color(0x3A6B3A);
 
     // ── Tabs ──────────────────────────────────────────────────────
-    public static final int TAB_EMPLOYEES = 0;
-    public static final int TAB_PRODUCTS  = 1;
-    public static final int TAB_STORE     = 2;
-    public static final int TAB_RECEIPTS  = 3;
-    public static final int TAB_CLIENTS   = 4;
+    public static final int TAB_PRODUCTS = 0;
+    public static final int TAB_STORE    = 1;
+    public static final int TAB_RECEIPTS = 2;
+    public static final int TAB_CLIENTS  = 3;
 
-    private static final String[] TABS = {"Працівники", "Товари", "Магазин", "Чеки", "Клієнти"};
+    private static final String[] TABS = {"Товари", "Магазин", "Чеки", "Клієнти"};
 
     private static final String[][] COLUMNS = {
-            {"ID", "Прізвище", "Ім'я", "По батькові", "Посада", "Зарплата", "Дата нар.", "Дата початку", "Телефон", "Місто", "Вулиця", "Індекс"},
             {"ID товару", "Назва", "Виробник", "Характеристики", "Категорія"},
             {"UPC", "Назва", "Ціна продажу", "К-сть", "Акційний"},
-            {"Номер чека", "Дата", "ID касира", "Сума", "ПДВ", "Карта клієнта"},
-            {"Номер карти", "Прізвище", "Ім'я", "По батькові", "Телефон", "Адреса", "Знижка %"}
+            {"Номер чека", "Дата", "Сума", "ПДВ", "Карта клієнта"},
+            {"Номер карти", "Прізвище", "Ім'я", "По батькові", "Телефон", "Знижка %"}
     };
 
     // ── State ─────────────────────────────────────────────────────
     private int activeTab = 0;
 
-    // ── UI: tabs & table ──────────────────────────────────────────
-    private JPanel   tabBar;
-    private JTable   table;
+    // ── UI: structure ─────────────────────────────────────────────
+    private JPanel tabBar;
+    private JTable table;
     private DefaultTableModel tableModel;
-    private JPanel   filterPanel;    // змінюється при перемиканні табу
-    private JPanel   contentCenter;  // містить filterPanel + tablePanel
+    private JPanel filterPanel;
+    private JPanel contentCenter;
 
     // ── UI: Header ────────────────────────────────────────────────
-    private JTextField searchField;
+    private JTextField searchField;   // пошук за назвою (п.4) або прізвищем (п.6)
+    private JButton    btnSearch;
+    private JLabel     lblCashierName; // п.15 — ім'я касира у хедері
 
-    // ── UI: Filter controls (всі оголошені тут для геттерів) ──────
-
-    // Працівники
-    private JCheckBox  chkCashiersOnly;
-    private JButton    btnSortBySurname;
-
-    // Товари
+    // ── Filter: Товари (п.1, п.5, п.12, п.13) ────────────────────
     private JComboBox<String> cbProductCategory;
     private JButton           btnFilterByCategory;
 
-    // Магазин
-    private JComboBox<String> cbStoreSort;      // "За назвою" / "За к-стю"
-    private JComboBox<String> cbStoreFilter;    // "Всі" / "Акційні" / "Не акційні"
+    // ── Filter: Магазин (п.2, п.12, п.13, п.14) ──────────────────
+    private JComboBox<String> cbStoreSort;    // "За назвою" / "За к-стю"
+    private JComboBox<String> cbStoreFilter;  // "Всі" / "Акційні" / "Не акційні"
     private JTextField        txtUpc;
     private JButton           btnFindByUpc;
 
-    // Чеки
-    private JComboBox<String> cbCashier;        // "Всі касири" або конкретний
-    private JTextField        txtDateFrom;
-    private JTextField        txtDateTo;
-    private JButton           btnFilterReceipts;
-    private JButton           btnTotalByCashier;
-    private JButton           btnTotalAll;
-    private JButton           btnProductQty;    // к-сть певного товару за період
+    // ── Filter: Чеки (п.9, п.10, п.11) ───────────────────────────
+    private JButton    btnToday;
+    private JTextField txtDateFrom;
+    private JTextField txtDateTo;
+    private JButton    btnFilterReceipts;
+    private JTextField txtReceiptNumber;
+    private JButton    btnFindByReceipt;
 
-    // Клієнти
-    private JTextField txtDiscountFilter;
-    private JButton    btnFilterByDiscount;
+    // ── Filter: Клієнти (п.3, п.6, п.8) ──────────────────────────
+    private JTextField txtClientSurname;
+    private JButton    btnSearchClient;
 
-    // ── UI: Bottom buttons ────────────────────────────────────────
+    // ── Bottom buttons ────────────────────────────────────────────
     private JButton addButton;
     private JButton editButton;
-    private JButton deleteButton;
-    private JButton printButton;
+    private JButton btnNewReceipt;   // п.7 — продаж товарів
+    private JButton btnMyProfile;    // п.15 — інфо про себе
 
     // ── Constructor ───────────────────────────────────────────────
-    public ManagerFrame() {
-        setTitle("ZLAGODA — Менеджер");
+    public CashierFrame() {
+        setTitle("ZLAGODA — Касир");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 750);
+        setSize(1100, 700);
         setLocationRelativeTo(null);
         setResizable(true);
 
@@ -114,16 +108,26 @@ public class ManagerFrame extends JFrame {
         };
         header.setPreferredSize(new Dimension(0, 70));
         header.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0,0,2,0, BORDER_CLR),
+                BorderFactory.createMatteBorder(0,0,2,0,BORDER_CLR),
                 BorderFactory.createEmptyBorder(0,20,0,20)
         ));
+
+        // Logo + cashier name (п.15)
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setOpaque(false);
 
         JLabel logo = new JLabel("ZLAGODA");
         logo.setFont(new Font("Georgia", Font.PLAIN, 30));
         logo.setForeground(TEXT_DARK);
-        header.add(logo, BorderLayout.WEST);
+        leftPanel.add(logo, BorderLayout.WEST);
 
-        // Search bar
+        lblCashierName = new JLabel("  |  Касир");
+        lblCashierName.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblCashierName.setForeground(TEXT_GRAY);
+        leftPanel.add(lblCashierName, BorderLayout.CENTER);
+        header.add(leftPanel, BorderLayout.WEST);
+
+        // Search bar (п.4 — за назвою, п.6 — за прізвищем)
         JPanel searchWrap = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -142,18 +146,29 @@ public class ManagerFrame extends JFrame {
         searchField.setBorder(null);
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         searchField.setForeground(TEXT_DARK);
-        searchField.setToolTipText("Пошук за прізвищем або UPC");
+        searchField.setToolTipText("Пошук товару за назвою або клієнта за прізвищем");
         searchWrap.add(searchField, BorderLayout.CENTER);
 
-        JLabel icon = new JLabel("⌕");
-        icon.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        icon.setForeground(TEXT_GRAY);
-        searchWrap.add(icon, BorderLayout.EAST);
+        btnSearch = new JButton("⌕") {
+            @Override protected void paintComponent(Graphics g) {
+                g.setColor(new Color(0xC5C5C5)); g.fillRect(0,0,getWidth(),getHeight());
+                super.paintComponent(g);
+            }
+            @Override protected void paintBorder(Graphics g){}
+        };
+        btnSearch.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        btnSearch.setForeground(TEXT_GRAY);
+        btnSearch.setContentAreaFilled(false);
+        btnSearch.setBorderPainted(false);
+        btnSearch.setFocusPainted(false);
+        btnSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        searchWrap.add(btnSearch, BorderLayout.EAST);
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 16));
         right.setOpaque(false);
         right.add(searchWrap);
         header.add(right, BorderLayout.EAST);
+
         return header;
     }
 
@@ -168,16 +183,15 @@ public class ManagerFrame extends JFrame {
         tabBar = buildTabBar();
         content.add(tabBar, BorderLayout.NORTH);
 
-        // center: filterPanel on top, table below
         contentCenter = new JPanel(new BorderLayout());
         contentCenter.setBackground(BG_DARK);
 
         filterPanel = buildFilterPanel(activeTab);
-        contentCenter.add(filterPanel, BorderLayout.NORTH);
+        contentCenter.add(filterPanel,    BorderLayout.NORTH);
         contentCenter.add(buildTablePanel(), BorderLayout.CENTER);
 
-        content.add(contentCenter, BorderLayout.CENTER);
-        content.add(buildButtonPanel(), BorderLayout.SOUTH);
+        content.add(contentCenter,       BorderLayout.CENTER);
+        content.add(buildButtonPanel(),  BorderLayout.SOUTH);
         return content;
     }
 
@@ -224,55 +238,53 @@ public class ManagerFrame extends JFrame {
         activeTab = idx;
         tabBar.repaint();
 
-        // Swap filter panel
         contentCenter.remove(filterPanel);
         filterPanel = buildFilterPanel(idx);
         contentCenter.add(filterPanel, BorderLayout.NORTH);
         contentCenter.revalidate();
         contentCenter.repaint();
 
-        // Reset table columns
         tableModel.setColumnIdentifiers(COLUMNS[idx]);
         tableModel.setRowCount(0);
         styleTable();
 
-        // Hide "Додати" on Receipts tab (тільки касир створює чеки)
-        addButton.setVisible(idx != TAB_RECEIPTS);
+        // На табі Товари/Магазин — тільки перегляд, без Додати/Редагувати
+        // На табі Клієнти — можна Додати/Редагувати (п.8)
+        // На табі Чеки — тільки перегляд
+        addButton.setVisible(idx == TAB_CLIENTS);
+        editButton.setVisible(idx == TAB_CLIENTS);
     }
 
     // ═════════════════════════════════════════════════════════════
-    // FILTER PANEL  (різний для кожного табу)
+    // FILTER PANEL
     // ═════════════════════════════════════════════════════════════
     private JPanel buildFilterPanel(int tab) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         panel.setBackground(BG_FILTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(0,4,0,4));
 
         switch (tab) {
 
-            case TAB_EMPLOYEES -> {
-                // п.5: всі за прізвищем | п.6: тільки касири
-                chkCashiersOnly = new JCheckBox("Тільки касири");
-                styleCheckbox(chkCashiersOnly);
-                btnSortBySurname = makeFilterButton("↕ За прізвищем");
-                panel.add(filterLabel("Працівники:"));
-                panel.add(btnSortBySurname);
-                panel.add(chkCashiersOnly);
-            }
-
             case TAB_PRODUCTS -> {
-                // п.9: за назвою | п.13: за категорією
+                // п.1: за назвою | п.5: за категорією | п.12/13: акційні/не акційні
                 cbProductCategory = new JComboBox<>();
-                styleCombo(cbProductCategory, 180);
                 cbProductCategory.addItem("Всі категорії");
-                btnFilterByCategory = makeFilterButton("Фільтр");
+                styleCombo(cbProductCategory, 170);
+
+                JComboBox<String> cbProductFilter = new JComboBox<>(
+                        new String[]{"Всі товари", "Акційні", "Не акційні"});
+                styleCombo(cbProductFilter, 150);
+
+                btnFilterByCategory = makeFilterButton("Застосувати");
+
                 panel.add(filterLabel("Категорія:"));
                 panel.add(cbProductCategory);
+                panel.add(filterLabel("Фільтр:"));
+                panel.add(cbProductFilter);
                 panel.add(btnFilterByCategory);
             }
 
             case TAB_STORE -> {
-                // п.10: за к-стю | п.15/16: акційні/не акційні | п.14: за UPC
+                // п.2: за назвою | п.12/13: акційні | п.14: за UPC
                 cbStoreFilter = new JComboBox<>(new String[]{"Всі товари","Акційні","Не акційні"});
                 styleCombo(cbStoreFilter, 150);
 
@@ -286,46 +298,44 @@ public class ManagerFrame extends JFrame {
                 panel.add(cbStoreFilter);
                 panel.add(filterLabel("Сорт.:"));
                 panel.add(cbStoreSort);
-                panel.add(Box.createHorizontalStrut(16));
+                panel.add(Box.createHorizontalStrut(12));
                 panel.add(filterLabel("UPC:"));
                 panel.add(txtUpc);
                 panel.add(btnFindByUpc);
             }
 
             case TAB_RECEIPTS -> {
-                // п.17-21: касир, діапазон дат, суми
-                cbCashier = new JComboBox<>();
-                cbCashier.addItem("Всі касири");
-                styleCombo(cbCashier, 160);
+                // п.9: за сьогодні | п.10: за період | п.11: за номером чека
+                btnToday = makeFilterButton("📅 Сьогодні");
 
                 txtDateFrom = makeFilterTextField("від дд.мм.рррр", 110);
                 txtDateTo   = makeFilterTextField("до дд.мм.рррр",  110);
+                btnFilterReceipts = makeFilterButton("Показати");
 
-                btnFilterReceipts  = makeFilterButton("Показати чеки");
-                btnTotalByCashier  = makeFilterButton("Σ Касира");
-                btnTotalAll        = makeFilterButton("Σ Всіх");
-                btnProductQty      = makeFilterButton("К-сть товару");
+                txtReceiptNumber = makeFilterTextField("Номер чека", 110);
+                btnFindByReceipt = makeFilterButton("Деталі чека");
 
-                panel.add(filterLabel("Касир:"));
-                panel.add(cbCashier);
+                panel.add(btnToday);
+                panel.add(Box.createHorizontalStrut(8));
                 panel.add(filterLabel("Період:"));
                 panel.add(txtDateFrom);
                 panel.add(filterLabel("—"));
                 panel.add(txtDateTo);
                 panel.add(btnFilterReceipts);
-                panel.add(Box.createHorizontalStrut(8));
-                panel.add(btnTotalByCashier);
-                panel.add(btnTotalAll);
-                panel.add(btnProductQty);
+                panel.add(Box.createHorizontalStrut(12));
+                panel.add(filterLabel("Чек №:"));
+                panel.add(txtReceiptNumber);
+                panel.add(btnFindByReceipt);
             }
 
             case TAB_CLIENTS -> {
-                // п.7: за прізвищем | п.12: за відсотком знижки
-                txtDiscountFilter  = makeFilterTextField("Знижка %", 80);
-                btnFilterByDiscount = makeFilterButton("Фільтр");
-                panel.add(filterLabel("Знижка %:"));
-                panel.add(txtDiscountFilter);
-                panel.add(btnFilterByDiscount);
+                // п.3: за прізвищем | п.6: пошук за прізвищем | п.8: додати/редагувати
+                txtClientSurname = makeFilterTextField("Прізвище клієнта", 160);
+                btnSearchClient  = makeFilterButton("Знайти");
+
+                panel.add(filterLabel("Пошук:"));
+                panel.add(txtClientSurname);
+                panel.add(btnSearchClient);
             }
         }
         return panel;
@@ -395,15 +405,24 @@ public class ManagerFrame extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         panel.setOpaque(false);
 
-        printButton  = makeActionButton("🖨  Друк",       BTN_LIGHT, TEXT_DARK);
-        deleteButton = makeActionButton("✕  Видалити",    BTN_LIGHT, TEXT_DARK);
-        editButton   = makeActionButton("✎  Редагувати",  BTN_LIGHT, TEXT_DARK);
-        addButton    = makeActionButton("+  Додати",       BTN_DARK,  Color.WHITE);
+        // п.15 — інфо про себе
+        btnMyProfile = makeActionButton("👤  Мій профіль", BTN_LIGHT, TEXT_DARK);
 
-        panel.add(printButton);
-        panel.add(deleteButton);
+        // п.8 — додати клієнта (видно тільки на табі Клієнти)
+        addButton  = makeActionButton("+  Додати",       BTN_DARK,  Color.WHITE);
+        editButton = makeActionButton("✎  Редагувати",   BTN_LIGHT, TEXT_DARK);
+
+        // п.7 — створити чек (завжди видно)
+        btnNewReceipt = makeActionButton("🧾  Новий чек",  BTN_GREEN, Color.WHITE);
+
+        // За замовчуванням на першому табі (Товари) — без Додати/Редагувати
+        addButton.setVisible(false);
+        editButton.setVisible(false);
+
+        panel.add(btnMyProfile);
         panel.add(editButton);
         panel.add(addButton);
+        panel.add(btnNewReceipt);
         return panel;
     }
 
@@ -474,13 +493,6 @@ public class ManagerFrame extends JFrame {
         box.setFocusable(false);
     }
 
-    private void styleCheckbox(JCheckBox chk) {
-        chk.setOpaque(false);
-        chk.setForeground(TEXT_LIGHT);
-        chk.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        chk.setFocusPainted(false);
-    }
-
     private JLabel filterLabel(String text) {
         JLabel l = new JLabel(text);
         l.setForeground(new Color(0xAAAAAA));
@@ -493,10 +505,9 @@ public class ManagerFrame extends JFrame {
     // ═════════════════════════════════════════════════════════════
 
     // Table
-    public JTable            getTable()       { return table; }
-    public DefaultTableModel getTableModel()  { return tableModel; }
-    public int               getActiveTab()   { return activeTab; }
-    public JTextField        getSearchField() { return searchField; }
+    public JTable            getTable()      { return table; }
+    public DefaultTableModel getTableModel() { return tableModel; }
+    public int               getActiveTab()  { return activeTab; }
 
     public Object getSelectedId() {
         int row = table.getSelectedRow();
@@ -510,48 +521,44 @@ public class ManagerFrame extends JFrame {
         styleTable();
     }
 
+    // Header
+    public JTextField getSearchField()  { return searchField; }
+    public JButton    getBtnSearch()    { return btnSearch; }
+
+    // п.15 — встановити ім'я касира в хедері
+    public void setCashierName(String name) {
+        lblCashierName.setText("  |  " + name);
+    }
+
     // Bottom buttons
-    public JButton getAddButton()     { return addButton; }
-    public JButton getEditButton()    { return editButton; }
-    public JButton getDeleteButton()  { return deleteButton; }
-    public JButton getPrintButton()   { return printButton; }
+    public JButton getAddButton()      { return addButton; }
+    public JButton getEditButton()     { return editButton; }
+    public JButton getBtnNewReceipt()  { return btnNewReceipt; }  // п.7
+    public JButton getBtnMyProfile()   { return btnMyProfile; }   // п.15
 
-    // Employees filter
-    public JCheckBox getChkCashiersOnly()  { return chkCashiersOnly; }
-    public JButton   getBtnSortBySurname() { return btnSortBySurname; }
-
-    // Products filter
+    // Товари filter
     public JComboBox<String> getCbProductCategory()   { return cbProductCategory; }
     public JButton           getBtnFilterByCategory() { return btnFilterByCategory; }
 
-    // Store filter
+    // Магазин filter
     public JComboBox<String> getCbStoreSort()   { return cbStoreSort; }
     public JComboBox<String> getCbStoreFilter() { return cbStoreFilter; }
     public JTextField        getTxtUpc()        { return txtUpc; }
     public JButton           getBtnFindByUpc()  { return btnFindByUpc; }
 
-    // Receipts filter
-    public JComboBox<String> getCbCashier()         { return cbCashier; }
-    public JTextField        getTxtDateFrom()        { return txtDateFrom; }
-    public JTextField        getTxtDateTo()          { return txtDateTo; }
-    public JButton           getBtnFilterReceipts()  { return btnFilterReceipts; }
-    public JButton           getBtnTotalByCashier()  { return btnTotalByCashier; }
-    public JButton           getBtnTotalAll()        { return btnTotalAll; }
-    public JButton           getBtnProductQty()      { return btnProductQty; }
+    // Чеки filter
+    public JButton    getBtnToday()          { return btnToday; }
+    public JTextField getTxtDateFrom()       { return txtDateFrom; }
+    public JTextField getTxtDateTo()         { return txtDateTo; }
+    public JButton    getBtnFilterReceipts() { return btnFilterReceipts; }
+    public JTextField getTxtReceiptNumber()  { return txtReceiptNumber; }
+    public JButton    getBtnFindByReceipt()  { return btnFindByReceipt; }
 
-    // Clients filter
-    public JTextField getTxtDiscountFilter()   { return txtDiscountFilter; }
-    public JButton    getBtnFilterByDiscount() { return btnFilterByDiscount; }
+    // Клієнти filter
+    public JTextField getTxtClientSurname() { return txtClientSurname; }
+    public JButton    getBtnSearchClient()  { return btnSearchClient; }
 
-    // Populate cashier combo (controller calls this after loading employees)
-    public void setCashiers(String[] cashiers) {
-        if (cbCashier == null) return;
-        cbCashier.removeAllItems();
-        cbCashier.addItem("Всі касири");
-        for (String c : cashiers) cbCashier.addItem(c);
-    }
-
-    // Populate category combo
+    // Populate categories
     public void setCategories(String[] categories) {
         if (cbProductCategory == null) return;
         cbProductCategory.removeAllItems();
@@ -565,6 +572,6 @@ public class ManagerFrame extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
         catch (Exception ignored) {}
-        SwingUtilities.invokeLater(() -> new ManagerFrame().setVisible(true));
+        SwingUtilities.invokeLater(() -> new CashierFrame().setVisible(true));
     }
 }
