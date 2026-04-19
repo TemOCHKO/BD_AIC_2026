@@ -34,8 +34,11 @@ public class SaleDao {
     // =============================================
     public List<Sale> getSalesByCheckNumber(String checkNumber) throws SQLException {
         List<Sale> list = new ArrayList<>();
-        String sql = "SELECT s.UPC, s.check_number, s.product_number, s.selling_price " +
+        String sql = "SELECT s.UPC, s.check_number, s.product_number, s.selling_price, " +
+                "p.product_name " +
                 "FROM Sale s " +
+                "JOIN Store_Product sp ON s.UPC = sp.upc " +
+                "JOIN Product p ON sp.id_product = p.id_product " +
                 "WHERE s.check_number = ?";
 
         PreparedStatement stmt = connection.prepareStatement(sql);

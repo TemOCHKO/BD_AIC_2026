@@ -18,7 +18,11 @@ public class CheckDao {
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setString(1, check.getCheck_number());
         stmt.setString(2, check.getId_employee());
-        stmt.setString(3, check.getCard_number());
+        if (check.getCard_number() != null) {
+            stmt.setString(3, check.getCard_number());
+        } else {
+            stmt.setNull(3, java.sql.Types.VARCHAR);
+        }
         stmt.setString(4, check.getPrint_date());
         stmt.setDouble(5, check.getSum_total());
         stmt.setDouble(6, check.getVat());

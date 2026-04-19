@@ -86,7 +86,17 @@ public class StoreProductDAO {
         while (rs.next()) list.add(mapStoreProduct(rs));
         return list;
     }
-
+    // Сортування за назвою
+    public List<Store_Product> getAllSortedByName() throws SQLException {
+        List<Store_Product> list = new ArrayList<>();
+        String sql = "SELECT sp.*, p.product_name FROM Store_Product sp " +
+                "JOIN Product p ON sp.id_product = p.id_product " +
+                "ORDER BY p.product_name ASC";
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        while (rs.next()) list.add(mapStoreProduct(rs));
+        return list;
+    }
     // 6. Акційні відсортовані за назвою
     public List<Store_Product> getPromotionalSortedByName() throws SQLException {
         List<Store_Product> list = new ArrayList<>();
