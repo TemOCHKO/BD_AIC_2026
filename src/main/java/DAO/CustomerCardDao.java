@@ -149,4 +149,23 @@ public class CustomerCardDao {
         }
         return list;
     }
+    // Оновлення карти клієнта
+    public boolean updateCustomerCard(Customer_card c) throws SQLException {
+        String sql = "UPDATE Customer_Card SET cust_surname = ?, cust_name = ?, cust_patronymic = ?, " +
+                "phone_number = ?, city = ?, street = ?, zip_code = ?, percent = ? " +
+                "WHERE card_number = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, c.getCust_surname());
+            stmt.setString(2, c.getCust_name());
+            stmt.setString(3, c.getCust_patronymic());
+            stmt.setString(4, c.getPhone_number());
+            stmt.setString(5, c.getCity());
+            stmt.setString(6, c.getStreet());
+            stmt.setString(7, c.getZip_code());
+            stmt.setInt(8, c.getPercent());
+            stmt.setString(9, c.getCard_number());
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
 }

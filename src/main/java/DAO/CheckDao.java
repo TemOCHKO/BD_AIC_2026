@@ -101,6 +101,7 @@ public class CheckDao {
         return list;
     }
 
+
     // Пошук чека за номером з усіма деталями
     public Check getCheckByNumber(String checkNumber) throws SQLException {
         String sql = "SELECT * FROM `Check` WHERE check_number = ?";
@@ -119,5 +120,48 @@ public class CheckDao {
             }
         }
         return null;
+    }
+
+    // Чеки касира за сьогодні
+    public List<Check> getChecksByEmployeeToday(String idEmployee) throws SQLException {
+        List<Check> list = new ArrayList<>();
+        String sql = "SELECT * FROM `Check` WHERE id_employee = ? AND DATE(print_date) = CURDATE()";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, idEmployee);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(new Check(
+                        rs.getString("check_number"),
+                        rs.getString("id_employee"),
+                        rs.getString("card_number"),
+                        rs.getString("print_date"),
+                        rs.getDouble("sum_total"),
+                        rs.getDouble("vat")
+                ));
+            }
+        }
+        return list;
+    }
+
+    // Всі чеки всіх касирів за певний період
+    public List<Check> getChecksByPeriod(String dateFrom, String dateTo) throws SQLException {
+        List<Check> list = new ArrayList<>();
+        String sql = "SELECT * FROM `Check` WHERE print_date BETWEEN ? AND ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, dateFrom);
+            stmt.setString(2, dateTo);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(new Check(
+                        rs.getString("check_number"),
+                        rs.getString("id_employee"),
+                        rs.getString("card_number"),
+                        rs.getString("print_date"),
+                        rs.getDouble("sum_total"),
+                        rs.getDouble("vat")
+                ));
+            }
+        }
+        return list;
     }
 }
