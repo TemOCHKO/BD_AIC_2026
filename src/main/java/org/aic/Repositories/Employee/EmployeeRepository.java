@@ -104,10 +104,16 @@ public class EmployeeRepository implements IEmployeeRepository {
         }
         return null;
     }
+
+    @Override
+    public EmployeeDBModel getEmplById(String id) throws SQLException {
+        return null;
+    }
+
     /**
      * отримати працівника за id
      */
-    public EmployeeDBModel getEmplById(String id) throws SQLException {
+    public EmployeeDBModel getEmplByI(String id) throws SQLException {
         String sql = "SELECT * FROM Employee WHERE id_employee = ?";
 
         PreparedStatement stmt = connection.prepareStatement(sql);

@@ -5,6 +5,7 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.List;
 
 public class ManagerFrame extends JFrame {
 
@@ -54,6 +55,7 @@ public class ManagerFrame extends JFrame {
     private JTextField searchField;
 
     // ── UI: Filter controls (всі оголошені тут для геттерів) ──────
+    private JButton[] tabButtons;
 
     // Працівники
     private JCheckBox  chkCashiersOnly;
@@ -188,6 +190,8 @@ public class ManagerFrame extends JFrame {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 8));
         bar.setOpaque(false);
 
+        tabButtons = new JButton[TABS.length]; // Initialize the array
+
         for (int i = 0; i < TABS.length; i++) {
             final int idx = i;
             JButton btn = new JButton(TABS[i]) {
@@ -214,36 +218,32 @@ public class ManagerFrame extends JFrame {
             btn.setFocusPainted(false);
             btn.setPreferredSize(new Dimension(140, 38));
             btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btn.addActionListener(e -> switchTab(idx));
+
+            // REMOVED: btn.addActionListener(e -> switchTab(idx));
+
+            tabButtons[i] = btn; // Store in array
             bar.add(btn);
         }
         return bar;
     }
 
-    private void switchTab(int idx) {
+    // Rename this and remove the table/button logic
+    public void updateViewForTab(int idx) {
         activeTab = idx;
         tabBar.repaint();
 
-        // Swap filter panel
+        // Swap filter panel visually
         contentCenter.remove(filterPanel);
         filterPanel = buildFilterPanel(idx);
         contentCenter.add(filterPanel, BorderLayout.NORTH);
         contentCenter.revalidate();
         contentCenter.repaint();
-
-        // Reset table columns
-        tableModel.setColumnIdentifiers(COLUMNS[idx]);
-        tableModel.setRowCount(0);
-        styleTable();
-
-        // Hide "Додати" on Receipts tab (тільки касир створює чеки)
-        addButton.setVisible(idx != TAB_RECEIPTS);
     }
 
     // ═════════════════════════════════════════════════════════════
     // FILTER PANEL  (різний для кожного табу)
     // ═════════════════════════════════════════════════════════════
-    private JPanel buildFilterPanel(int tab) {
+    public JPanel buildFilterPanel(int tab) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         panel.setBackground(BG_FILTER);
         panel.setBorder(BorderFactory.createEmptyBorder(0,4,0,4));
@@ -356,7 +356,7 @@ public class ManagerFrame extends JFrame {
         return panel;
     }
 
-    private void styleTable() {
+    public void styleTable() {
         table.setRowHeight(46);
         table.setShowGrid(true);
         table.setGridColor(BORDER_CLR);
@@ -496,6 +496,7 @@ public class ManagerFrame extends JFrame {
     public JTable            getTable()       { return table; }
     public DefaultTableModel getTableModel()  { return tableModel; }
     public int               getActiveTab()   { return activeTab; }
+    public void              setActiveTab(int idx) { activeTab = idx; }
     public JTextField        getSearchField() { return searchField; }
 
     public Object getSelectedId() {
@@ -566,5 +567,29 @@ public class ManagerFrame extends JFrame {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
         catch (Exception ignored) {}
         SwingUtilities.invokeLater(() -> new ManagerFrame().setVisible(true));
+    }
+
+    public Component getTabBar() {
+        return  tabBar;
+    }
+
+    public JPanel getContentCenter() {
+        return contentCenter;
+    }
+
+    public JPanel getFilterPanel() {
+        return filterPanel;
+    }
+
+    public void setFilterPanel(JPanel jPanel) {
+        filterPanel = jPanel;
+    }
+
+    public static String[][] getColumns() {
+        return COLUMNS;
+    }
+
+    public JButton[] getTabButtons() {
+        return tabButtons;
     }
 }
