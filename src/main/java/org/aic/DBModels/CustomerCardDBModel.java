@@ -2,7 +2,7 @@ package org.aic.DBModels;
 
 public class CustomerCardDBModel {
 
-    private int card_number;
+    private String card_number;
     private String cust_surname;
     private String cust_name;
     private String cust_patronymic;
@@ -10,11 +10,11 @@ public class CustomerCardDBModel {
     private String city;
     private String street;
     private String zip_code;
-    private double percent;
+    private int percent;
 
-    public CustomerCardDBModel(int card_number, String cust_name, String cust_surname,
+    public CustomerCardDBModel(String card_number, String cust_name, String cust_surname,
                          String cust_patronymic, String phone_number, String city,
-                         String street, String zip_code, double percent) {
+                         String street, String zip_code, int percent) {
         this.card_number = card_number;
         this.cust_name = cust_name;
         this.cust_surname = cust_surname;
@@ -25,7 +25,7 @@ public class CustomerCardDBModel {
         this.zip_code = zip_code;
         this.percent = percent;
     }
-    public int getCard_number() {
+    public String getCard_number() {
         return card_number;
     }
     public String getCust_name() {
@@ -49,11 +49,11 @@ public class CustomerCardDBModel {
     public String getZip_code() {
         return zip_code;
     }
-    public double getPercent() {
+    public int getPercent() {
         return percent;
     }
 
-    public void setCard_number(int card_number) {
+    public void setCard_number(String card_number) {
         this.card_number = card_number;
     }
     public void setCust_name(String cust_name) {
@@ -77,7 +77,7 @@ public class CustomerCardDBModel {
     public void setZip_code(String zip_code) {
         this.zip_code = zip_code;
     }
-    public void setPercent(double percent) {
+    public void setPercent(int percent) {
         this.percent = percent;
     }
 }

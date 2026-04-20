@@ -1,13 +1,12 @@
 package org.aic.UI.Controllers;
 
-import org.aic.DBModels.CheckDBModel;
-import org.aic.DBModels.EmployeeDBModel;
-import org.aic.DBModels.ProductDBModel;
-import org.aic.DBModels.StoreProductDBModel;
+import org.aic.DBModels.*;
 import org.aic.Repositories.Category.CategoryRepository;
 import org.aic.Repositories.Category.ICategoryRepository;
 import org.aic.Repositories.Check.CheckRepository;
 import org.aic.Repositories.Check.ICheckRepository;
+import org.aic.Repositories.CustomerCard.CustomerCardRepository;
+import org.aic.Repositories.CustomerCard.ICustomerCardRepository;
 import org.aic.Repositories.Employee.EmployeeRepository;
 import org.aic.Repositories.Employee.IEmployeeRepository;
 import org.aic.Repositories.Product.IProductRepository;
@@ -18,6 +17,8 @@ import org.aic.Services.Category.CategoryService;
 import org.aic.Services.Category.ICategoryService;
 import org.aic.Services.Check.CheckService;
 import org.aic.Services.Check.ICheckService;
+import org.aic.Services.CustomerCard.CustomerCardService;
+import org.aic.Services.CustomerCard.ICustomerCardService;
 import org.aic.Services.Employee.EmployeeService;
 import org.aic.Services.Employee.IEmployeeService;
 import org.aic.Services.Product.IProductService;
@@ -26,10 +27,7 @@ import org.aic.Services.StoreProduct.IStoreProductService;
 import org.aic.Services.StoreProduct.StoreProductService;
 import org.aic.Storage.DataBaseConnection;
 import org.aic.UI.Views.ManagerFrame;
-import org.aic.UI.Views.TableModels.CheckFullTableModel;
-import org.aic.UI.Views.TableModels.EmployeeFullTableModel;
-import org.aic.UI.Views.TableModels.ProductFullTableModel;
-import org.aic.UI.Views.TableModels.StoreProductFullTableModel;
+import org.aic.UI.Views.TableModels.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,19 +36,20 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class ManagerController {
-
     private boolean isSurnameAscending = false;
     private final ManagerFrame managerView;
     private final IEmployeeService employeeService;
     private final IProductService productService;
     private final IStoreProductService storeProductService;
     private final ICheckService checkService;
-    public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService, ICheckService checkService) {
+    private final ICustomerCardService customerCardService;
+    public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService, ICheckService checkService, ICustomerCardService customerCardService) {
         this.managerView = managerFrame;
         this.employeeService = employeeService;
         this.productService = productService;
         this.storeProductService = storeProductService;
         this.checkService = checkService;
+        this.customerCardService = customerCardService;
         initController();
     }
 
@@ -213,6 +212,13 @@ public class ManagerController {
 
                 managerView.styleTable();
                 break;
+            case ManagerFrame.TAB_CLIENTS:
+                var customerList = customerCardService.getAllCustomerCards();
+                CustomerCardFullTableModel customerCardFullTableModel = new CustomerCardFullTableModel(customerList);
+                managerView.getTable().setModel(customerCardFullTableModel);
+
+                managerView.styleTable();
+                break;
             default:
                 break;
         }
@@ -304,6 +310,18 @@ public class ManagerController {
                 handleTabSwitch(ManagerFrame.TAB_RECEIPTS);
             }
 
+            case ManagerFrame.TAB_CLIENTS -> {
+                CustomerCardFullTableModel customerCardFullTableModel = (CustomerCardFullTableModel) managerView.getTable().getModel();
+                CustomerCardDBModel selectedCustomer = customerCardFullTableModel.getClientAt(selectedRow);
+
+                customerCardService.deleteCustomerCard(selectedCustomer.getCard_number());
+
+                JOptionPane.showMessageDialog(managerView, "Карту Клієнта успішно видалено!");
+
+                // Refresh the table data
+                handleTabSwitch(ManagerFrame.TAB_CLIENTS);
+            }
+
             // Add cases for TAB_STORE, TAB_RECEIPTS, TAB_CLIENTS as needed
             default -> {
                 System.out.println("Видалення не підтримується для цієї вкладки.");
@@ -328,9 +346,6 @@ public class ManagerController {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-
-
     }
 
     public static void main(String[] args) {
@@ -353,15 +368,17 @@ public class ManagerController {
             ICategoryRepository categoryRepository = new CategoryRepository(connection);
             IStoreProductRepository storeProductRepository = new StoreProductRepository(connection);
             ICheckRepository checkRepository = new CheckRepository(connection);
+            ICustomerCardRepository customerCardRepository = new CustomerCardRepository(connection);
 
             IProductService prService = new ProductService(productRepository, categoryRepository);
             IStoreProductService storeProductService = new StoreProductService(storeProductRepository);
             ICheckService checkService = new CheckService(checkRepository);
+            ICustomerCardService customerCardService = new CustomerCardService(customerCardRepository);
             // 1. Create the View
             ManagerFrame view = new ManagerFrame();
 
             // 2. Create the Controller, passing the View as a dependency
-            ManagerController controller = new ManagerController(view, emplService, prService, storeProductService, checkService);
+            ManagerController controller = new ManagerController(view, emplService, prService, storeProductService, checkService, customerCardService);
 
             // 3. Show the View
             view.setVisible(true);
