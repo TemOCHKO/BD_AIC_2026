@@ -1,14 +1,14 @@
 package org.aic.DBModels;
 
 public class CheckDBModel {
-    private int check_number;
+    private String check_number;
     private String id_employee;
     private String card_number;
     private String print_date;
     private double sum_total;
     private double vat;
 
-    public CheckDBModel(int check_number, String id_employee,
+    public CheckDBModel(String check_number, String id_employee,
                  String card_number, String print_date,
                  double sum_total, double vat) {
         this.check_number = check_number;
@@ -19,7 +19,7 @@ public class CheckDBModel {
         this.vat = vat;
 
     }
-    public int getCheck_number() {
+    public String getCheck_number() {
         return check_number;
     }
     public String getId_employee() {
@@ -38,7 +38,7 @@ public class CheckDBModel {
         return vat;
     }
 
-    public void setCheck_number(int check_number) {
+    public void setCheck_number(String check_number) {
         this.check_number = check_number;
     }
     public void setId_employee(String id_employee) {
