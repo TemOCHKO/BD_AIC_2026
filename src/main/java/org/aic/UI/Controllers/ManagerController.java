@@ -2,27 +2,34 @@ package org.aic.UI.Controllers;
 
 import org.aic.DBModels.EmployeeDBModel;
 import org.aic.DBModels.ProductDBModel;
+import org.aic.DBModels.StoreProductDBModel;
 import org.aic.Repositories.Category.CategoryRepository;
 import org.aic.Repositories.Category.ICategoryRepository;
 import org.aic.Repositories.Employee.EmployeeRepository;
 import org.aic.Repositories.Employee.IEmployeeRepository;
 import org.aic.Repositories.Product.IProductRepository;
 import org.aic.Repositories.Product.ProductRepository;
+import org.aic.Repositories.StoreProduct.IStoreProductRepository;
+import org.aic.Repositories.StoreProduct.StoreProductRepository;
 import org.aic.Services.Category.CategoryService;
 import org.aic.Services.Category.ICategoryService;
 import org.aic.Services.Employee.EmployeeService;
 import org.aic.Services.Employee.IEmployeeService;
 import org.aic.Services.Product.IProductService;
 import org.aic.Services.Product.ProductService;
+import org.aic.Services.StoreProduct.IStoreProductService;
+import org.aic.Services.StoreProduct.StoreProductService;
 import org.aic.Storage.DataBaseConnection;
 import org.aic.UI.Views.ManagerFrame;
 import org.aic.UI.Views.TableModels.EmployeeFullTableModel;
 import org.aic.UI.Views.TableModels.ProductFullTableModel;
+import org.aic.UI.Views.TableModels.StoreProductFullTableModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class ManagerController {
 
@@ -30,10 +37,12 @@ public class ManagerController {
     private final ManagerFrame managerView;
     private final IEmployeeService employeeService;
     private final IProductService productService;
-    public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService) {
+    private final IStoreProductService storeProductService;
+    public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService) {
         this.managerView = managerFrame;
         this.employeeService = employeeService;
         this.productService = productService;
+        this.storeProductService = storeProductService;
         initController();
     }
 
@@ -182,6 +191,13 @@ public class ManagerController {
                 initProductController();
                 managerView.styleTable();
                 break;
+            case 2:
+                var storeProductList = storeProductService.getAllSortedByName();
+                StoreProductFullTableModel storeProductFullTableModel = new StoreProductFullTableModel(storeProductList);
+                managerView.getTable().setModel(storeProductFullTableModel);
+
+                managerView.styleTable();
+                break;
             default:
                 break;
         }
@@ -244,6 +260,23 @@ public class ManagerController {
                 handleTabSwitch(ManagerFrame.TAB_PRODUCTS);
             }
 
+            case ManagerFrame.TAB_STORE -> {
+                StoreProductFullTableModel model = (StoreProductFullTableModel) managerView.getTable().getModel();
+                StoreProductDBModel selectedStoreProd = model.getStoreProductAt(selectedRow);
+
+                try {
+                    storeProductService.deleteStoreProduct(selectedStoreProd.getUPC());
+                } catch (IllegalAccessException e) {
+                    showInputErrorMessage(e.getMessage());
+                    return;
+                }
+
+                JOptionPane.showMessageDialog(managerView, "Товар в магазині успішно видалено!");
+
+                // Refresh the table data
+                handleTabSwitch(ManagerFrame.TAB_PRODUCTS);
+            }
+
             // Add cases for TAB_STORE, TAB_RECEIPTS, TAB_CLIENTS as needed
             default -> {
                 System.out.println("Видалення не підтримується для цієї вкладки.");
@@ -291,13 +324,15 @@ public class ManagerController {
 
             IProductRepository productRepository = new ProductRepository(connection);
             ICategoryRepository categoryRepository = new CategoryRepository(connection);
-            IProductService prService = new ProductService(productRepository, categoryRepository);
+            IStoreProductRepository storeProductRepository = new StoreProductRepository(connection);
 
+            IProductService prService = new ProductService(productRepository, categoryRepository);
+            IStoreProductService storeProductService = new StoreProductService(storeProductRepository);
             // 1. Create the View
             ManagerFrame view = new ManagerFrame();
 
             // 2. Create the Controller, passing the View as a dependency
-            ManagerController controller = new ManagerController(view, emplService, prService);
+            ManagerController controller = new ManagerController(view, emplService, prService, storeProductService);
 
             // 3. Show the View
             view.setVisible(true);

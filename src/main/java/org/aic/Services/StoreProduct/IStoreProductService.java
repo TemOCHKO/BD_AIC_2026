@@ -2,7 +2,10 @@ package org.aic.Services.StoreProduct;
 
 import org.aic.DBModels.StoreProductDBModel;
 
+import java.sql.SQLException;
+import java.util.List;
+
 public interface IStoreProductService {
-    Iterable<StoreProductDBModel> getAllStoreProducts();
-    StoreProductDBModel getStoreProductById(String upc);
+    List<StoreProductDBModel> getAllSortedByName();
+    boolean deleteStoreProduct(String upc) throws IllegalAccessException;
 }

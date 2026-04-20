@@ -3,6 +3,10 @@ package org.aic.Services.StoreProduct;
 import org.aic.DBModels.StoreProductDBModel;
 import org.aic.Repositories.StoreProduct.IStoreProductRepository;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
+
 public class StoreProductService implements IStoreProductService {
 
     private IStoreProductRepository storeProductRepository;
@@ -13,13 +17,22 @@ public class StoreProductService implements IStoreProductService {
 
 
     @Override
-    public Iterable<StoreProductDBModel> getAllStoreProducts() {
-        return storeProductRepository.getStoreProducts();
+    public List<StoreProductDBModel> getAllSortedByName() {
+        try {
+            return storeProductRepository.getAllSortedByName();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public StoreProductDBModel getStoreProductById(String upc) {
-        return storeProductRepository.getStoreProductById(upc);
+    public boolean deleteStoreProduct(String upc) throws IllegalAccessException {
+        try {
+            return storeProductRepository.deleteStoreProduct(upc);
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new IllegalAccessException("Неможливо видалити цей товар, оскільки він вже фігурує у продажах (чеках). Історія продажів має бути збережена.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
-
 }
