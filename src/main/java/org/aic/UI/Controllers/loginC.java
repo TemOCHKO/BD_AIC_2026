@@ -1,3 +1,4 @@
+/*
 package org.aic.UI.Controllers;
 
 import org.aic.UI.Views.login;
@@ -49,7 +50,8 @@ public class LoginController {
         }
     }
 
-    private void openMainFrame(Employee emp) {
+   */
+/* private void openMainFrame(Employee emp) {
         if (emp.getEmpl_role().equals("Manager")) {
             ManagerFrame mf = new ManagerFrame();
             new ManagerController(mf, connection);
@@ -60,5 +62,6 @@ public class LoginController {
             new CashierController(cf, connection);
             cf.setVisible(true);
         }
-    }
-}
+    }*//*
+
+}*/

@@ -8,6 +8,7 @@ import org.aic.Repositories.Product.IProductRepository;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ProductService implements IProductService {
     private final IProductRepository productRepository;
@@ -23,7 +24,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Iterable<ProductDBModel> getAllProducts() {
+    public List<ProductDBModel> getAllProducts() {
         try {
             return productRepository.getAllProducts();
         } catch (SQLException e) {

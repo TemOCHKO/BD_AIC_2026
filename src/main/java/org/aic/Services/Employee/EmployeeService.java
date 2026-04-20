@@ -2,14 +2,19 @@ package org.aic.Services.Employee;
 
 import org.aic.DBModels.EmployeeDBModel;
 import org.aic.DTOModels.Employee.EmployeeListDTO;
-import org.aic.DTOModels.ProductTableDTO;
 import org.aic.Repositories.Employee.IEmployeeRepository;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class EmployeeService implements IEmployeeService {
+
+    private static final String CASHIER_ROLE = "cashier";
+    private static final int COLUMNS_NUM = 12;
+    private List<EmployeeDBModel> employeeList = null;
 
     private final IEmployeeRepository employeeRepository;
 
@@ -18,13 +23,53 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public Iterable<EmployeeDBModel> getAllEmployees() {
+    public List<EmployeeDBModel> getAllEmployees() {
+        if (employeeList != null) {
+            return employeeList;
+        }
+
         try {
-            return employeeRepository.getAllEmployees();
+            employeeList = employeeRepository.getAllEmployees();
+            return  employeeList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<EmployeeDBModel> getOnlyCashiers() {
+        if (employeeList != null) {
+            List<EmployeeDBModel> res = new ArrayList<>();
+            for (var empl : employeeList) {
+                if (empl.getEmpl_role().equalsIgnoreCase(CASHIER_ROLE)) {
+                    res.add(empl);
+                }
+            }
+            return res;
+        }
+
+        try {
+            return employeeRepository.getAllCashiers();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<EmployeeDBModel> getAllEmployeesSortedBySurname() {
+        if (employeeList == null) {
+            try {
+                employeeList = employeeRepository.getAllEmployees();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        employeeList.sort(Comparator.comparing(EmployeeDBModel::getEmpl_surname));
+        return employeeList;
+    }
+
+
 
     @Override
     public Iterable<EmployeeListDTO> getAllListEmployeesDTO() {

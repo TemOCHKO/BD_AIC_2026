@@ -9,7 +9,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IEmployeeService {
-    Iterable<EmployeeDBModel> getAllEmployees();
+    List<EmployeeDBModel> getAllEmployees();
+    List<EmployeeDBModel> getOnlyCashiers();
+    List<EmployeeDBModel> getAllEmployeesSortedBySurname();
     Iterable<EmployeeListDTO> getAllListEmployeesDTO();
     EmployeeDBModel getEmployeeBySurname(String name);
     EmployeeDBModel getEmployeeById(String id);
