@@ -1,35 +1,66 @@
 package org.aic.DBModels;
 
-import java.util.UUID;
-
 public class StoreProductDBModel {
-    public UUID id;
-    public String upc;
-    public String upcSale;
-    public int productId;
-    public double price;
-    public int numberOfProducts;
-    public boolean promotionalProduct;
+    private String UPC;
+    private String UPC_prom;
+    private int id_product;
+    private String product_name;
+    private double selling_price;
+    private int products_number;
+    private boolean promotional_product;
 
-    // Not a promotional product
-    public StoreProductDBModel(String upc, int productId, double price, int numberOfProducts, boolean promotionalProduct) {
-        this(UUID.randomUUID(), upc, null, productId, price, numberOfProducts, promotionalProduct);
+    public StoreProductDBModel(String UPC, String UPC_prom, int id_product, String product_name,
+                         double selling_price, int products_number,
+                         boolean promotional_product) {
+        this.UPC = UPC;
+        this.UPC_prom = UPC_prom;
+        this.id_product = id_product;
+        this.product_name = product_name;
+        this.selling_price = selling_price;
+        this.products_number = products_number;
+        this.promotional_product = promotional_product;
+
+    }
+    public String getUPC() {
+        return UPC;
+    }
+    public String getUPC_prom() {
+        return UPC_prom;
+    }
+    public int getId_product() {
+        return id_product;
+    }
+    public double getSelling_price() {
+        return selling_price;
+    }
+    public int getProducts_number() {
+        return products_number;
+    }
+    public boolean getPromotional_product() {
+        return promotional_product;
     }
 
-    // Promotional
-    public StoreProductDBModel(String upc, String upcSale, int productId, double price, int numberOfProducts, boolean promotionalProduct) {
-        this(UUID.randomUUID(), upc, upcSale, productId, price, numberOfProducts, promotionalProduct);
+
+    public void setUPC(String UPC) {
+        this.UPC = UPC;
+    }
+    public void setUPC_prom(String UPC_prom) {
+        this.UPC_prom = UPC_prom;
+    }
+    public void setId_product(int id_product) {
+        this.id_product = id_product;
+    }
+    public void setSelling_price(double selling_price) {
+        this.selling_price = selling_price;
+    }
+    public void setProducts_number(int products_number) {
+        this.products_number = products_number;
+    }
+    public void setPromotional_product(boolean promotional_product) {
+        this.promotional_product = promotional_product;
     }
 
-    public StoreProductDBModel(UUID id, String upc, String upcSale, int productId, double price, int numberOfProducts, boolean promotionalProduct) {
-        this.id = id;
-        this.upc = upc;
-        this.upcSale = upcSale;
-        this.productId = productId;
-        this.price = price;
-        this.numberOfProducts = numberOfProducts;
-        this.promotionalProduct = promotionalProduct;
+    public String getProduct_name() {
+        return product_name;
     }
-
-
 }

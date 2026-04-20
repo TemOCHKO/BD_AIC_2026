@@ -1,3 +1,4 @@
+/*
 package org.aic.Storage;
 
 import org.aic.DBModels.CategoryDBModel;
@@ -121,7 +122,8 @@ public class InMemoryStorageContext implements IStorageContext {
                 sp1, sp2, sp3, sp4, sp5, sp6, sp7, sp8, sp9, sp10
         ));
 
-        /*
+        */
+/*
         DIARY,
         FRESH,
         MEAT,
@@ -133,7 +135,8 @@ public class InMemoryStorageContext implements IStorageContext {
         PHARMACY,
         HOUSEHOLD,
         PET
-         */
+         *//*
+
 
         CategoryRecord c1 = new CategoryRecord(0, "DIARY");
         CategoryRecord c2 = new CategoryRecord(1, "FRESH");
@@ -228,3 +231,4 @@ public class InMemoryStorageContext implements IStorageContext {
     }
 
 }
+*/
