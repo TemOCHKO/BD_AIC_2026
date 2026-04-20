@@ -169,12 +169,11 @@ public class EmployeeRepository implements IEmployeeRepository {
         );
     }
     //пошук за прізвищем
-    public List<EmployeeDBModel> getEmployeeBySurname(String surname) throws SQLException {
+    public List<EmployeeDBModel> getEmployeesSortedBySurname() throws SQLException {
         List<EmployeeDBModel> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employee WHERE empl_surname = ?";
+        String sql = "SELECT * FROM Employee ORDER BY empl_surname COLLATE utf8mb4_unicode_ci ASC";
 
         PreparedStatement stmt = connection.prepareStatement(sql);
-        stmt.setString(1, surname);
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {

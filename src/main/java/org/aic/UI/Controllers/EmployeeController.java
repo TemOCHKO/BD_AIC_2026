@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+@Deprecated
 public class EmployeeController {
 
     private final EmployeesListView listView;

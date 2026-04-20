@@ -1,7 +1,10 @@
 package org.aic.UI.Views;
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class AddEmpl extends JDialog {
@@ -38,10 +41,12 @@ public class AddEmpl extends JDialog {
     private static final Font FONT_BTN   = new Font("SansSerif", Font.PLAIN, 13);
 
     // ── Fields ───────────────────────────────────────────────────────────────
+    private JButton save;
+    private JButton cancel;
     private JTextField       tfSurname, tfName, tfPatronymic;
     private JComboBox<String> cbRole;
     private JTextField       tfSalary;
-    private JSpinner         spBirth, spStart;
+    private DatePicker         spBirth, spStart;
     private JTextField       tfPhone, tfCity, tfStreet, tfZip;
 
     public AddEmpl(Frame owner) {
@@ -103,7 +108,7 @@ public class AddEmpl extends JDialog {
         card.add(labeled("ПО БАТЬКОВІ", tfPatronymic = darkField()));
         card.add(vGap(14));
 
-        String[] roles = {"Менеджер", "Касир", "Директор", "Старший касир"};
+        String[] roles = {"Manager", "Cashier"};
         cbRole = new JComboBox<>(roles);
         styleCombo(cbRole);
         card.add(twoCol(
@@ -112,11 +117,15 @@ public class AddEmpl extends JDialog {
         ));
         card.add(vGap(14));
 
-        spBirth = makeDateSpinner();
-        spStart = makeDateSpinner();
+        spBirth = new DatePicker();
+        spStart = new DatePicker();
+
+        spBirth.setDateToToday();
+        spStart.setDateToToday();
+
         card.add(twoCol(
                 labeled("ДАТА НАРОДЖЕННЯ", spBirth),
-                labeled("ДАТА ПОЧАТКУ",    spStart)
+                labeled("ДАТА ПОЧАТКУ", spStart)
         ));
         card.add(vGap(18));
 
@@ -144,10 +153,9 @@ public class AddEmpl extends JDialog {
         p.setOpaque(false);
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton save   = pillButton("Зберегти",  BTN_SAVE_BG, BTN_SAVE_FG,   true);
-        JButton cancel = pillButton("Скасувати", BG_CARD,     BTN_CANCEL_FG, false);
+        save = pillButton("Зберегти",  BTN_SAVE_BG, BTN_SAVE_FG,   true);
+        cancel = pillButton("Скасувати", BG_CARD,     BTN_CANCEL_FG, false);
 
-        save.addActionListener(e -> onSave());
         cancel.addActionListener(e -> dispose());
 
         p.add(save);
@@ -158,20 +166,7 @@ public class AddEmpl extends JDialog {
     // ── Event handlers ────────────────────────────────────────────────────────
 
     private void onSave() {
-        if (tfSurname.getText().trim().isEmpty() || tfName.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Прізвище та ім'я є обов'язковими полями.",
-                    "Помилка", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        System.out.printf("Новий працівник: %s %s %s | %s | %s грн | %s | %s, %s, %s%n",
-                tfSurname.getText().trim(), tfName.getText().trim(), tfPatronymic.getText().trim(),
-                cbRole.getSelectedItem(), tfSalary.getText().trim(),
-                tfPhone.getText().trim(), tfCity.getText().trim(),
-                tfStreet.getText().trim(), tfZip.getText().trim());
 
-        JOptionPane.showMessageDialog(this, "Працівника збережено!", "Успіх", JOptionPane.INFORMATION_MESSAGE);
-        dispose();
     }
 
     // ── UI helpers ────────────────────────────────────────────────────────────
@@ -334,5 +329,57 @@ public class AddEmpl extends JDialog {
 
             System.exit(0);
         });
+    }
+
+    public JButton getSaveButton() {
+        return save;
+    }
+
+    public JButton getCancelButton() {
+        return cancel;
+    }
+
+    public JTextField getSurnameField() {
+        return tfSurname;
+    }
+
+    public JTextField getNameField() {
+        return tfName;
+    }
+
+    public JTextField getPatronymicField() {
+        return tfPatronymic;
+    }
+
+    public JComboBox<String> getRoleField() {
+        return cbRole;
+    }
+
+    public JTextField getSalaryField() {
+        return tfSalary;
+    }
+
+    public JTextField getPhoneField() {
+        return tfPhone;
+    }
+
+    public JTextField getCityField() {
+        return tfCity;
+    }
+
+    public JTextField getStreetField() {
+        return tfStreet;
+    }
+
+    public JTextField getZipField() {
+        return tfZip;
+    }
+
+    public DatePicker getDobField() {
+        return spBirth;
+    }
+
+    public DatePicker getDosField() {
+        return spStart;
     }
 }

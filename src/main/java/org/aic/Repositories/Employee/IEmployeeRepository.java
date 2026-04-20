@@ -14,7 +14,7 @@ public interface IEmployeeRepository {
     EmployeeDBModel getEmplBySurname(String surname) throws SQLException;
     EmployeeDBModel getEmplById(String id) throws SQLException;
     void updateEmployee(EmployeeDBModel emp) throws SQLException;
-    List<EmployeeDBModel> getEmployeeBySurname(String surname) throws SQLException;
+    List<EmployeeDBModel> getEmployeesSortedBySurname() throws SQLException;
     EmployeeDBModel getEmployeeById(String id) throws SQLException;
 
     void saveNewEmployee(EmployeeDBModel employeeDBModel) throws SQLException;

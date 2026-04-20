@@ -43,6 +43,7 @@ public class ManagerController {
     private final IStoreProductService storeProductService;
     private final ICheckService checkService;
     private final ICustomerCardService customerCardService;
+    private EmployeesController employeesController;
     public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService, ICheckService checkService, ICustomerCardService customerCardService) {
         this.managerView = managerFrame;
         this.employeeService = employeeService;
@@ -50,6 +51,7 @@ public class ManagerController {
         this.storeProductService = storeProductService;
         this.checkService = checkService;
         this.customerCardService = customerCardService;
+
         initController();
     }
 
@@ -87,6 +89,7 @@ public class ManagerController {
         managerView.styleTable();
 
         managerView.getDeleteButton().addActionListener(e -> handleDeleteAction());
+        managerView.getAddButton().addActionListener(e -> handleAddAction());
         // Example of where you will bind other UI actions:
         // Using an ItemListener (Recommended for Checkboxes)
         initEmployeeController();
@@ -100,14 +103,14 @@ public class ManagerController {
             boolean isChecked = managerView.getChkCashiersOnly().isSelected();
             EmployeeFullTableModel tableModel;
             if (isChecked) {
-                System.out.println("Checkbox is CHECKED! Filtering for cashiers only...");
+                //System.out.println("Checkbox is CHECKED! Filtering for cashiers only...");
                 tableModel = new EmployeeFullTableModel(employeeService.getOnlyCashiers());
                 managerView.getTable().setModel(tableModel);
 
                 managerView.styleTable();
             } else {
                 isSurnameAscending = false;
-                System.out.println("Checkbox is UNCHECKED! Showing all employees...");
+                //System.out.println("Checkbox is UNCHECKED! Showing all employees...");
                 tableModel = new EmployeeFullTableModel(employeeService.getAllEmployees());
                 managerView.getTable().setModel(tableModel);
 
@@ -182,7 +185,7 @@ public class ManagerController {
 
         switch (tabIndex) {
             case ManagerFrame.TAB_EMPLOYEES:
-                var list = employeeService.getAllEmployees();
+                var list = employeeService.getAllEmployeesSortedBySurname();
                 EmployeeFullTableModel fullTableModel = new EmployeeFullTableModel(list);
                 managerView.getTable().setModel(fullTableModel);
 
@@ -330,7 +333,16 @@ public class ManagerController {
     }
 
     private void handleAddAction() {
+        int currentTab = managerView.getActiveTab();
 
+        switch (currentTab) {
+            case ManagerFrame.TAB_EMPLOYEES -> {
+                employeesController = new EmployeesController(employeeService);
+                employeesController.showAddEmployeeDialog();
+
+                handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
+            }
+        }
     }
 
     private void handleEditAction() {

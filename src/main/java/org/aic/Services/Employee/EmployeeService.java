@@ -24,10 +24,6 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public List<EmployeeDBModel> getAllEmployees() {
-        if (employeeList != null) {
-            return employeeList;
-        }
-
         try {
             employeeList = employeeRepository.getAllEmployees();
             return  employeeList;
@@ -38,7 +34,7 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public List<EmployeeDBModel> getOnlyCashiers() {
-        if (employeeList != null) {
+      /*  if (employeeList != null) {
             List<EmployeeDBModel> res = new ArrayList<>();
             for (var empl : employeeList) {
                 if (empl.getEmpl_role().equalsIgnoreCase(CASHIER_ROLE)) {
@@ -46,7 +42,7 @@ public class EmployeeService implements IEmployeeService {
                 }
             }
             return res;
-        }
+        }*/
 
         try {
             return employeeRepository.getAllCashiers();
@@ -57,15 +53,14 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public List<EmployeeDBModel> getAllEmployeesSortedBySurname() {
-        if (employeeList == null) {
+        //if (employeeList == null) {
             try {
-                employeeList = employeeRepository.getAllEmployees();
+                employeeList = employeeRepository.getEmployeesSortedBySurname();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }
+        //}
 
-        employeeList.sort(Comparator.comparing(EmployeeDBModel::getEmpl_surname));
         return employeeList;
     }
 
@@ -130,6 +125,7 @@ public class EmployeeService implements IEmployeeService {
         for (var empl : employeeList) {
             if (empl.getId_employee().equalsIgnoreCase(id)) {
                 employeeList.remove(empl);
+                break; // <--- This stops the loop instantly, preventing the crash!
             }
         }
     }
