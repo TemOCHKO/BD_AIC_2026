@@ -90,6 +90,7 @@ public class ManagerController {
 
         managerView.getDeleteButton().addActionListener(e -> handleDeleteAction());
         managerView.getAddButton().addActionListener(e -> handleAddAction());
+        managerView.getEditButton().addActionListener(e -> handleEditAction());
         // Example of where you will bind other UI actions:
         // Using an ItemListener (Recommended for Checkboxes)
         initEmployeeController();
@@ -168,7 +169,7 @@ public class ManagerController {
      * Handles the logic of switching tabs: updating UI state, changing columns,
      * and managing specific component visibility.
      */
-    private void handleTabSwitch(int tabIndex) {
+    public void handleTabSwitch(int tabIndex) {
         // 1. Tell the view to redraw its specific panels for the new tab
         managerView.updateViewForTab(tabIndex);
 
@@ -337,7 +338,7 @@ public class ManagerController {
 
         switch (currentTab) {
             case ManagerFrame.TAB_EMPLOYEES -> {
-                employeesController = new EmployeesController(employeeService);
+                employeesController = new EmployeesController(this, employeeService);
                 employeesController.showAddEmployeeDialog();
 
                 handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
@@ -358,6 +359,17 @@ public class ManagerController {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        switch (currentTab) {
+            case ManagerFrame.TAB_EMPLOYEES -> {
+                employeesController = new EmployeesController(this, employeeService);
+                employeesController.showEditEmployeeDialog();
+
+                handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
+            }
+        }
+
+
     }
 
     public static void main(String[] args) {
@@ -409,6 +421,10 @@ public class ManagerController {
                 message,
                 "",
                 JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public ManagerFrame getManagerView() {
+        return managerView;
     }
 
 

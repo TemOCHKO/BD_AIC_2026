@@ -382,4 +382,23 @@ public class AddEmpl extends JDialog {
     public DatePicker getDosField() {
         return spStart;
     }
+
+    public void setEmployeeData(String surname, String name, String patronymic,
+                                String role, String salary, LocalDate dob, LocalDate dos,
+                                String phone, String city, String street, String zip) {
+        tfSurname.setText(surname);
+        tfName.setText(name);
+        tfPatronymic.setText(patronymic);
+        cbRole.setSelectedItem(role);
+        tfSalary.setText(salary);
+
+        if (dob != null) getDobField().setDate(dob);
+        if (dos != null) getDosField().setDate(dos);
+
+        tfPhone.setText(phone);
+        tfCity.setText(city);
+        tfStreet.setText(street);
+        tfZip.setText(zip);
+    }
+
 }
