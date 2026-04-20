@@ -126,6 +126,12 @@ public class EmployeeService implements IEmployeeService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        for (var empl : employeeList) {
+            if (empl.getId_employee().equalsIgnoreCase(id)) {
+                employeeList.remove(empl);
+            }
+        }
     }
 
 

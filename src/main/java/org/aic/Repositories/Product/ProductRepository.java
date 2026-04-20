@@ -67,4 +67,38 @@ public class ProductRepository implements IProductRepository {
 
         stmt.execute();
     }
+
+    public boolean deleteProductById(int idProduct) throws SQLException, SQLIntegrityConstraintViolationException {
+        String deleteStoreProducts = "DELETE FROM store_product WHERE id_product = ?";
+        String deleteProduct = "DELETE FROM product WHERE id_product = ?";
+
+        // 1. Start the transaction (don't save anything until we say so)
+        connection.setAutoCommit(false);
+
+        // 2. try-with-resources automatically closes both PreparedStatements!
+        try (PreparedStatement stmtStore = connection.prepareStatement(deleteStoreProducts);
+             PreparedStatement stmtProd = connection.prepareStatement(deleteProduct)) {
+
+            // Step A: Delete children first
+            stmtStore.setInt(1, idProduct);
+            stmtStore.executeUpdate();
+
+            // Step B: Delete parent
+            stmtProd.setInt(1, idProduct);
+            int rowsAffected = stmtProd.executeUpdate();
+
+            // 3. If we survived both queries without errors, save the changes!
+            connection.commit();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            // 4. PANIC! Something broke. Undo the child deletion so the DB stays consistent.
+            connection.rollback();
+            throw e; // Re-throw the error so your Controller/UI knows it failed
+
+        } finally {
+            // 5. Reset the connection back to its normal state
+            connection.setAutoCommit(true);
+        }
+    }
 }

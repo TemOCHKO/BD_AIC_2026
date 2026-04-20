@@ -1,5 +1,7 @@
 package org.aic.UI.Controllers;
 
+import org.aic.DBModels.EmployeeDBModel;
+import org.aic.DBModels.ProductDBModel;
 import org.aic.Repositories.Category.CategoryRepository;
 import org.aic.Repositories.Category.ICategoryRepository;
 import org.aic.Repositories.Employee.EmployeeRepository;
@@ -63,6 +65,12 @@ public class ManagerController {
             tabButtons[i].addActionListener(e -> handleTabSwitch(tabIndex));
         }
 
+        var empl = employeeService.getAllEmployeesSortedBySurname();
+        EmployeeFullTableModel tableModel = new EmployeeFullTableModel(empl);
+        managerView.getTable().setModel(tableModel);
+        managerView.styleTable();
+
+        managerView.getDeleteButton().addActionListener(e -> handleDeleteAction());
         // Example of where you will bind other UI actions:
         // Using an ItemListener (Recommended for Checkboxes)
         initEmployeeController();
@@ -96,6 +104,7 @@ public class ManagerController {
             EmployeeFullTableModel tableModel;
             if (managerView.getChkCashiersOnly().isSelected()) {
                 var cashiers = employeeService.getOnlyCashiers();
+
                 if (isSurnameAscending) {
                     tableModel = new EmployeeFullTableModel(cashiers);
                     managerView.getTable().setModel(tableModel);
@@ -128,7 +137,12 @@ public class ManagerController {
                 isSurnameAscending = true;
             }
 
-                });
+        });
+
+    }
+
+    private void initProductController() {
+
     }
 
     /**
@@ -165,6 +179,7 @@ public class ManagerController {
                 ProductFullTableModel productFullTableModel = new ProductFullTableModel(prList);
                 managerView.getTable().setModel(productFullTableModel);
 
+                initProductController();
                 managerView.styleTable();
                 break;
             default:
@@ -172,6 +187,68 @@ public class ManagerController {
         }
         // Object[][] tabData = storageService.getDataForTab(tabIndex);
         // view.setTableData(columns, tabData);
+    }
+
+    private void handleDeleteAction() {
+        // 1. Get the currently active tab and selected row
+        int currentTab = managerView.getActiveTab();
+        int selectedRow = managerView.getTable().getSelectedRow();
+
+        // 2. Prevent crashes if they click Delete without selecting anything
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(managerView,
+                    "Будь ласка, оберіть запис для видалення.",
+                    "Помилка",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 3. (Optional but recommended) Ask for confirmation
+        int confirm = JOptionPane.showConfirmDialog(managerView,
+                "Ви впевнені, що хочете видалити цей запис?",
+                "Підтвердження видалення",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return; // User clicked "No" or closed the dialog
+        }
+
+        // 4. Route the delete logic based on the active tab
+        switch (currentTab) {
+            case ManagerFrame.TAB_EMPLOYEES -> {
+                EmployeeFullTableModel model = (EmployeeFullTableModel) managerView.getTable().getModel();
+                EmployeeDBModel selectedEmp = model.getEmployeeAt(selectedRow);
+
+                employeeService.deleteEmployee(selectedEmp.getId_employee());
+
+                JOptionPane.showMessageDialog(managerView, "Працівника успішно видалено!");
+
+                // Refresh the table data
+                handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
+            }
+
+            case ManagerFrame.TAB_PRODUCTS -> {
+                ProductFullTableModel model = (ProductFullTableModel) managerView.getTable().getModel();
+                ProductDBModel selectedProd = model.getProductAt(selectedRow);
+
+                try {
+                    productService.deleteProductById(selectedProd.getDbId());
+                } catch (IllegalAccessException e) {
+                    showInputErrorMessage(e.getMessage());
+                    return;
+                }
+
+                JOptionPane.showMessageDialog(managerView, "Товар успішно видалено!");
+
+                // Refresh the table data
+                handleTabSwitch(ManagerFrame.TAB_PRODUCTS);
+            }
+
+            // Add cases for TAB_STORE, TAB_RECEIPTS, TAB_CLIENTS as needed
+            default -> {
+                System.out.println("Видалення не підтримується для цієї вкладки.");
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -204,4 +281,19 @@ public class ManagerController {
             view.setVisible(true);
         });
     }
+
+    private void showInputErrorMessage(String errorMessage) {
+        JOptionPane.showMessageDialog(managerView,
+                errorMessage,
+                "Input Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(managerView,
+                message,
+                "",
+                JOptionPane.PLAIN_MESSAGE);
+    }
+
 }

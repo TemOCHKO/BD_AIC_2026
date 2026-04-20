@@ -6,6 +6,7 @@ import org.aic.Repositories.Category.ICategoryRepository;
 import org.aic.Repositories.Product.IProductRepository;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,17 @@ public class ProductService implements IProductService {
     public void saveNewProduct(ProductDBModel productDBModel) {
         try {
             productRepository.saveNewProduct(productDBModel);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean deleteProductById(int id) throws IllegalAccessException {
+        try {
+            return productRepository.deleteProductById(id);
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            throw new IllegalAccessException("Cannot delete a product when store products and sales exist. Delete them first");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
