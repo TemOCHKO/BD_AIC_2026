@@ -251,6 +251,28 @@ public class ManagerController {
         }
     }
 
+    private void handleAddAction() {
+
+    }
+
+    private void handleEditAction() {
+        // 1. Get the currently active tab and selected row
+        int currentTab = managerView.getActiveTab();
+        int selectedRow = managerView.getTable().getSelectedRow();
+
+        // 2. Prevent crashes if they click Delete without selecting anything
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(managerView,
+                    "Будь ласка, оберіть запис для редагування",
+                    "Помилка",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+
+
+    }
+
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -295,5 +317,6 @@ public class ManagerController {
                 "",
                 JOptionPane.PLAIN_MESSAGE);
     }
+
 
 }

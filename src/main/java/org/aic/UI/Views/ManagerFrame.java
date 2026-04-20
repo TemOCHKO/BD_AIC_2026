@@ -24,6 +24,7 @@ public class ManagerFrame extends JFrame {
     private static final Color BTN_LIGHT  = new Color(0xE0E0E0);
     private static final Color BTN_ACCENT = new Color(0x555555);
 
+
     // ── Tabs ──────────────────────────────────────────────────────
     public static final int TAB_EMPLOYEES = 0;
     public static final int TAB_PRODUCTS  = 1;
@@ -346,6 +347,7 @@ public class ManagerFrame extends JFrame {
             @Override public boolean isCellEditable(int r, int c){return false;}
         };
         table = new JTable(tableModel);
+
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         styleTable();
 
@@ -592,4 +594,6 @@ public class ManagerFrame extends JFrame {
     public JButton[] getTabButtons() {
         return tabButtons;
     }
+
+
 }
