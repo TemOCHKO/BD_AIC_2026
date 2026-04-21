@@ -45,6 +45,7 @@ public class CashierFrame extends JFrame {
     private int activeTab = 0;
 
     // ── UI ────────────────────────────────────────────────────────
+    private JButton btnLogout;
     private JPanel   tabBar;
     private JTable   table;
     private DefaultTableModel tableModel;
@@ -116,12 +117,20 @@ public class CashierFrame extends JFrame {
         searchWrap.setPreferredSize(new Dimension(300, 38));
         searchWrap.setBorder(BorderFactory.createEmptyBorder(4,14,4,10));
 
+        btnLogout = new JButton("🚪 Вийти");
+        btnLogout.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btnLogout.setForeground(new Color(0xCC3333)); // Темно-червоний колір
+        btnLogout.setContentAreaFilled(false);
+        btnLogout.setBorderPainted(false);
+        btnLogout.setFocusPainted(false);
+        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         searchField = new JTextField();
         searchField.setOpaque(false);
         searchField.setBorder(null);
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         searchField.setForeground(TEXT_DARK);
-        searchWrap.add(searchField, BorderLayout.CENTER);
+        searchWrap.add(btnLogout, BorderLayout.CENTER);
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 16));
         right.setOpaque(false);
@@ -363,6 +372,7 @@ public class CashierFrame extends JFrame {
     public JButton           getBtnFilterReceipts() { return btnFilterReceipts; }
     public JTextField        getTxtDiscountFilter()   { return txtDiscountFilter; }
     public JButton           getBtnFilterByDiscount() { return btnFilterByDiscount; }
+    public JButton             getLogoutButton() { return btnLogout; }
 
 
     public void setCategories(String[] categories) {

@@ -23,8 +23,8 @@ public class EmployeeRepository implements IEmployeeRepository {
         String sql = "INSERT INTO Employee " +
                 "(id_employee, empl_surname, empl_name, empl_patronymic, " +
                 "empl_role, salary, date_of_birth, date_of_start, " +
-                "phone_number, city, street, zip_code) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "phone_number, city, street, zip_code, empl_password) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement stmt = connection.prepareStatement(sql);
 
@@ -40,6 +40,7 @@ public class EmployeeRepository implements IEmployeeRepository {
         stmt.setString(10, emp.getCity());
         stmt.setString(11, emp.getStreet());
         stmt.setString(12, emp.getZip_code());
+        stmt.setString(13, emp.getEmpl_password());
 
         stmt.executeUpdate();
 
@@ -133,7 +134,7 @@ public class EmployeeRepository implements IEmployeeRepository {
         String sql = "UPDATE Employee SET " +
                 "empl_surname = ?, empl_name = ?, empl_patronymic = ?, " +
                 "empl_role = ?, salary = ?, date_of_birth = ?, date_of_start = ?, " +
-                "phone_number = ?, city = ?, street = ?, zip_code = ? " +
+                "phone_number = ?, city = ?, street = ?, zip_code = ?, empl_password = ?" +
                 "WHERE id_employee = ?";
 
         PreparedStatement stmt = connection.prepareStatement(sql);
@@ -148,7 +149,8 @@ public class EmployeeRepository implements IEmployeeRepository {
         stmt.setString(9, emp.getCity());
         stmt.setString(10, emp.getStreet());
         stmt.setString(11, emp.getZip_code());
-        stmt.setString(12, emp.getId_employee());
+        stmt.setString(12, emp.getEmpl_password());
+        stmt.setString(13, emp.getId_employee());
         stmt.executeUpdate();
     }
 
@@ -230,7 +232,7 @@ public class EmployeeRepository implements IEmployeeRepository {
     public void saveNewEmployee(EmployeeDBModel employeeDBModel) throws SQLException {
         String newId = "EMP-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
 
-        String sql = "INSERT INTO employee(id_employee, empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employee(id_employee, empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zip_code, empl_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setString(1, newId);
         stmt.setString(2, employeeDBModel.getEmpl_surname());
@@ -244,6 +246,7 @@ public class EmployeeRepository implements IEmployeeRepository {
         stmt.setString(10, employeeDBModel.getCity());
         stmt.setString(11, employeeDBModel.getStreet());
         stmt.setString(12, employeeDBModel.getZip_code());
+        stmt.setString(13, employeeDBModel.getEmpl_password());
 
         stmt.execute();
     }

@@ -8,6 +8,7 @@ import org.aic.UI.Views.ManagerFrame;
 
 import javax.swing.*;
 import java.time.LocalDate;
+import java.util.Random;
 
 public class EmployeesController {
 
@@ -128,9 +129,7 @@ public class EmployeesController {
                 org.mindrot.jbcrypt.BCrypt.gensalt(12)
         );
 
-        // ── Зберігаємо в БД ───────────────────────────────────────
-        employeeService.saveNewEmployee(new EmployeeDBModel(
-                addEmployeeView.getSurnameField().getText().trim(),
+        employeeService.saveNewEmployee(new EmployeeDBModel(generateEmployeeId(), addEmployeeView.getSurnameField().getText(),
                 addEmployeeView.getNameField().getText().trim(),
                 addEmployeeView.getPatronymicField().getText().trim(),
                 addEmployeeView.getRoleField().getSelectedItem().toString().trim(),
@@ -141,26 +140,10 @@ public class EmployeesController {
                 addEmployeeView.getCityField().getText().trim(),
                 addEmployeeView.getStreetField().getText().trim(),
                 addEmployeeView.getZipField().getText().trim(),
-                hashedPassword  // ← передаємо хеш, не plain text!
+                hashedPassword
         ));
 
-        setEverytingToDefaultAndExit();
-
-
-        employeeService.saveNewEmployee(new EmployeeDBModel(addEmployeeView.getSurnameField().getText(),
-                addEmployeeView.getNameField().getText().trim(),
-                addEmployeeView.getPatronymicField().getText().trim(),
-                addEmployeeView.getRoleField().getSelectedItem().toString().trim(),
-                salary,
-                convertToDBDateString(addEmployeeView.getDobField()),
-                convertToDBDateString(addEmployeeView.getDosField()),
-                addEmployeeView.getPhoneField().getText().trim(),
-                addEmployeeView.getCityField().getText().trim(),
-                addEmployeeView.getStreetField().getText().trim(),
-                addEmployeeView.getZipField().getText().trim(),
-                addEmployeeView.getPassword().trim()
-        ));
-
+        showMessage("Successfully added new employee");
         setEverytingToDefaultAndExit();
         //loadData();
         //goBack(addEmployeeView);
@@ -310,7 +293,7 @@ public class EmployeesController {
     private void showMessage(String message) {
         JOptionPane.showMessageDialog(addEmployeeView,
                 message,
-                "",
+                "Success",
                 JOptionPane.PLAIN_MESSAGE);
     }
 
@@ -334,5 +317,21 @@ public class EmployeesController {
     private LocalDate convertFromDBDateString(String dbDateString) throws ArrayIndexOutOfBoundsException, NumberFormatException {
         String[] dates = dbDateString.split("-");
         return LocalDate.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]), Integer.parseInt(dates[2]));
+    }
+
+
+    public String generateEmployeeId() {
+        // The characters we want to pull from
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder("EMP-");
+        Random random = new Random();
+
+        // Loop 4 times to add 4 random characters (change the 4 if you want longer IDs!)
+        for (int i = 0; i < 4; i++) {
+            int randomIndex = random.nextInt(chars.length());
+            sb.append(chars.charAt(randomIndex));
+        }
+
+        return sb.toString();
     }
 }

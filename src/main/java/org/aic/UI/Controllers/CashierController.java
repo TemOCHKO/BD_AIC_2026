@@ -73,6 +73,14 @@ public class CashierController {
         cashierView.getEditButton().addActionListener(e -> handleEditAction());
         cashierView.getSearchField().addActionListener(e -> handleSearch());
 
+        cashierView.getLogoutButton().addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(cashierView, "Ви дійсно хочете вийти з акаунту?", "Вихід", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                cashierView.dispose(); // Закриваємо поточне вікно
+                org.aic.Main.showLoginScreen(); // Викликаємо вікно логіну з нашого нового класу Main
+            }
+        });
+
         handleTabSwitch(CashierFrame.TAB_PRODUCTS);
     }
 

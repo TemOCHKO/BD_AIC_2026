@@ -49,6 +49,7 @@ public class ManagerFrame extends JFrame {
     private int activeTab = 0;
 
     // ── UI: tabs & table ──────────────────────────────────────────
+    private JButton btnLogout;
     private JPanel   tabBar;
     private JTable   table;
     private DefaultTableModel tableModel;
@@ -143,15 +144,24 @@ public class ManagerFrame extends JFrame {
         searchWrap.setPreferredSize(new Dimension(300, 38));
         searchWrap.setBorder(BorderFactory.createEmptyBorder(4,14,4,10));
 
+        // Створюємо кнопку "Вийти"
+        btnLogout = new JButton("Вийти");
+        btnLogout.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btnLogout.setForeground(new Color(0xCC3333)); // Темно-червоний колір
+        btnLogout.setContentAreaFilled(false);
+        btnLogout.setBorderPainted(false);
+        btnLogout.setFocusPainted(false);
+        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         searchField = new JTextField();
         searchField.setOpaque(false);
         searchField.setBorder(null);
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         searchField.setForeground(TEXT_DARK);
         searchField.setToolTipText("Пошук за прізвищем або UPC");
-        searchWrap.add(searchField, BorderLayout.CENTER);
+        searchWrap.add(btnLogout, BorderLayout.CENTER);
 
-        JLabel icon = new JLabel("⌕");
+        JLabel icon = new JLabel("");
         icon.setFont(new Font("SansSerif", Font.PLAIN, 18));
         icon.setForeground(TEXT_GRAY);
         searchWrap.add(icon, BorderLayout.EAST);
@@ -599,6 +609,7 @@ public class ManagerFrame extends JFrame {
     public JButton[] getTabButtons() {
         return tabButtons;
     }
+    public JButton getLogoutButton() { return btnLogout; }
 
 
 }

@@ -51,6 +51,8 @@ public class loginC {
                 // Все ок — відкриваємо головне вікно
                 loginView.dispose();
 
+
+
                 if ("Manager".equals(role)) {
                     new ManagerFrame().setVisible(true);
                 } else {
@@ -63,13 +65,21 @@ public class loginC {
     }
 
     // ── Простий контейнер для даних з БД ─────────────────────────
-    private static class AuthData {
+    public static class AuthData {
         final String hashedPassword;
         final String role;
 
         AuthData(String hashedPassword, String role) {
             this.hashedPassword = hashedPassword;
             this.role           = role;
+        }
+
+        public String getHashedPassword() {
+            return hashedPassword;
+        }
+
+        public String getRole() {
+            return role;
         }
     }
 
@@ -78,23 +88,28 @@ public class loginC {
      * Повертає хеш пароля + роль, або null якщо ID не знайдено.
      * Пароль у запит НЕ передається — тільки ID.
      */
-    private static AuthData findEmployee(String id) {
+    public static AuthData findEmployee(String id) {
         String sql = "SELECT empl_password, empl_role FROM Employee WHERE id_employee = ?";
 
-        try (Connection conn = DataBaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        // 1. Отримуємо з'єднання ЗОВНІ блоку try-with-resources, щоб воно не закрилося!
+        try {
+            Connection conn = DataBaseConnection.getConnection();
 
-            ps.setString(1, id);
+            // 2. У try-with-resources кладемо ТІЛЬКИ PreparedStatement
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new AuthData(
-                            rs.getString("empl_password"),
-                            rs.getString("empl_role")
-                    );
+                ps.setString(1, id);
+
+                // 3. ResultSet теж можна покласти в try, він безпечно закриється сам
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(
+                                rs.getString("empl_password"),
+                                rs.getString("empl_role")
+                        );
+                    }
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null,

@@ -102,6 +102,14 @@ public class ManagerController {
         managerView.getEditButton().addActionListener(e -> handleEditAction());
         managerView.getSearchField().addActionListener(e -> handleSearch());
 
+        managerView.getLogoutButton().addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(managerView, "Ви дійсно хочете вийти з акаунту?", "Вихід", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                managerView.dispose(); // Закриваємо поточне вікно
+                org.aic.Main.showLoginScreen(); // Викликаємо вікно логіну з нашого нового класу Main
+            }
+        });
+
         initEmployeeController();
 
     }
