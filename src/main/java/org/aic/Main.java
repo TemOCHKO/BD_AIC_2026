@@ -76,7 +76,12 @@ public class Main {
 
             loginC.AuthData data = loginC.findEmployee(id);
 
-            if (data == null || !BCrypt.checkpw(password, data.getHashedPassword())) {
+            try {
+                if (data == null || !BCrypt.checkpw(password, data.getHashedPassword())) {
+                    loginView.showError("Невірний ID або пароль");
+                    return;
+                }
+            } catch (Exception e) {
                 loginView.showError("Невірний ID або пароль");
                 return;
             }

@@ -91,8 +91,7 @@ public class AddEmpl extends JDialog {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(BG_CARD);
         card.setBorder(new EmptyBorder(10, 10, 22, 10));
-        card.setPreferredSize(new Dimension(500, isAddMode ? 700 : 620));
-
+        card.setPreferredSize(new Dimension(500, 650));
         title = new JLabel(isAddMode ? "Додати нового працівника" : "Редагувати працівника");
         title.setFont(FONT_TITLE);
         title.setForeground(FG_TITLE);
@@ -143,20 +142,19 @@ public class AddEmpl extends JDialog {
         card.add(labeled("ВУЛИЦЯ", tfStreet = darkField()));
         card.add(vGap(18));
 
-        // ── Поля пароля — тільки при додаванні ───────────────────
-        if (isAddMode) {
-            card.add(divider());
-            card.add(vGap(18));
 
-            tfPassword        = darkPasswordField();
-            tfPasswordConfirm = darkPasswordField();
+        card.add(divider());
+        card.add(vGap(18));
 
-            card.add(twoCol(
-                    labeled("ПАРОЛЬ",              tfPassword),
-                    labeled("ПІДТВЕРДЖЕННЯ ПАРОЛЯ", tfPasswordConfirm)
-            ));
-            card.add(vGap(18));
-        }
+        tfPassword        = darkPasswordField();
+        tfPasswordConfirm = darkPasswordField();
+
+        card.add(twoCol(
+                labeled("ПАРОЛЬ",              tfPassword),
+                labeled("ПІДТВЕРДЖЕННЯ ПАРОЛЯ", tfPasswordConfirm)
+        ));
+        card.add(vGap(18));
+
 
         card.add(buildButtons());
         return card;
@@ -177,24 +175,34 @@ public class AddEmpl extends JDialog {
     }
 
     // ── Валідація пароля (викликається з контролера) ──────────────
+    // ── Валідація пароля (викликається з контролера) ──────────────
     public boolean validatePassword() {
-        if (!isAddMode) return true; // при редагуванні пароль не міняємо
+        String pass    = getPassword();
+        String confirm = getConfirmPassword();
 
-        String pass    = new String(tfPassword.getPassword()).trim();
-        String confirm = new String(tfPasswordConfirm.getPassword()).trim();
+        // 1. При редагуванні дозволяємо обидва порожні поля (це означає "не міняти пароль")
+        if (!isAddMode && pass.isEmpty() && confirm.isEmpty()) {
+            return true;
+        }
 
+        // 2. Якщо пароль порожній (але ми додаємо нового АБО заповнили лише підтвердження)
         if (pass.isEmpty()) {
             showError("Введіть пароль");
             return false;
         }
+
+        // 3. Перевірка довжини
         if (pass.length() < 4) {
             showError("Пароль має бути не менше 4 символів");
             return false;
         }
+
+        // 4. ОСЬ ТА САМА ПЕРЕВІРКА НА ЗБІГ:
         if (!pass.equals(confirm)) {
-            showError("Паролі не співпадають");
+            showError("Паролі не співпадають!");
             return false;
         }
+
         return true;
     }
 
@@ -355,6 +363,11 @@ public class AddEmpl extends JDialog {
     public String getPassword() {
         if (tfPassword == null) return null;
         return new String(tfPassword.getPassword()).trim();
+    }
+
+    public String getConfirmPassword() {
+        if (tfPasswordConfirm == null) return null;
+        return new String(tfPasswordConfirm.getPassword()).trim();
     }
 
     public void setEmployeeData(String surname, String name, String patronymic,

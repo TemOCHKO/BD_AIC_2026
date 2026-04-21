@@ -224,9 +224,40 @@ public class EmployeesController {
             showInputErrorMessage("Zip Code cant be bigger than " + 9 + " characters");
             return;
         }
-        int selectedRow = manager.getManagerView().getTable().getSelectedRow();
+        // ... (початок методу: перевірки на порожні поля Прізвища, Імені тощо) ...
 
-        employeeService.updateEmployee(new EmployeeDBModel(manager.getManagerView().getTable().getModel().getValueAt(selectedRow, 0).toString(), editEmployeeView.getSurnameField().getText(),
+        int selectedRow = manager.getManagerView().getTable().getSelectedRow();
+        if (selectedRow == -1) return;
+
+        String employeeId = manager.getManagerView().getTable().getModel().getValueAt(selectedRow, 0).toString().trim();
+
+        // 1. Отримуємо існуючого працівника з бази
+        EmployeeDBModel existingEmployee = employeeService.getEmployeeById(employeeId);
+        String finalPasswordHash = existingEmployee.getEmpl_password();
+
+        // 2. Зчитуємо новий пароль
+        String newPassword = editEmployeeView.getPassword().trim();
+
+        // 🔴 ЛОГІКА: Якщо пароля в базі НЕМАЄ, а користувач нічого не ввів — видаємо помилку
+        if ((finalPasswordHash == null || finalPasswordHash.isEmpty()) && newPassword.isEmpty()) {
+            showInputErrorMessage("Цьому працівнику обов'язково потрібно встановити пароль!");
+            return; // Зупиняємо збереження!
+        }
+
+        // 3. Якщо введено новий пароль — валідуємо та хешуємо його
+        if (!newPassword.isEmpty()) {
+            // Тепер викликаємо валідацію (з підтвердженням)
+            if (!editEmployeeView.validatePassword()) {
+                return;
+            }
+
+            finalPasswordHash = org.mindrot.jbcrypt.BCrypt.hashpw(
+                    newPassword,
+                    org.mindrot.jbcrypt.BCrypt.gensalt(12)
+            );
+        }
+
+        employeeService.updateEmployee(new EmployeeDBModel(employeeId, editEmployeeView.getSurnameField().getText(),
                 editEmployeeView.getNameField().getText().trim(),
                 editEmployeeView.getPatronymicField().getText().trim(),
                 editEmployeeView.getRoleField().getSelectedItem().toString().trim(),
@@ -237,13 +268,11 @@ public class EmployeesController {
                 editEmployeeView.getCityField().getText().trim(),
                 editEmployeeView.getStreetField().getText().trim(),
                 editEmployeeView.getZipField().getText().trim(),
-                editEmployeeView.getPassword().trim()
+                finalPasswordHash
         ));
 
         manager.handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
         setEverytingToDefaultAndExit();
-        //loadData();
-        //goBack(addEmployeeView);
     }
 
     private void setEverytingToDefaultAndExit() {

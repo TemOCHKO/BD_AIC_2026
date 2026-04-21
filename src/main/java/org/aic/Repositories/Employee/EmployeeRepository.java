@@ -131,27 +131,31 @@ public class EmployeeRepository implements IEmployeeRepository {
      * оновити працівника
      */
     public void updateEmployee(EmployeeDBModel emp) throws SQLException {
+        // ЗВЕРНІТЬ УВАГУ на пробіл перед словом WHERE!
         String sql = "UPDATE Employee SET " +
                 "empl_surname = ?, empl_name = ?, empl_patronymic = ?, " +
                 "empl_role = ?, salary = ?, date_of_birth = ?, date_of_start = ?, " +
-                "phone_number = ?, city = ?, street = ?, zip_code = ?, empl_password = ?" +
+                "phone_number = ?, city = ?, street = ?, zip_code = ?, empl_password = ? " +
                 "WHERE id_employee = ?";
 
-        PreparedStatement stmt = connection.prepareStatement(sql);
-        stmt.setString(1, emp.getEmpl_surname());
-        stmt.setString(2, emp.getEmpl_name());
-        stmt.setString(3, emp.getEmpl_patronymic());
-        stmt.setString(4, emp.getEmpl_role());
-        stmt.setDouble(5, emp.getSalary());
-        stmt.setString(6, emp.getDate_of_birth());
-        stmt.setString(7, emp.getDate_of_start());
-        stmt.setString(8, emp.getPhone_number());
-        stmt.setString(9, emp.getCity());
-        stmt.setString(10, emp.getStreet());
-        stmt.setString(11, emp.getZip_code());
-        stmt.setString(12, emp.getEmpl_password());
-        stmt.setString(13, emp.getId_employee());
-        stmt.executeUpdate();
+        // Використовуємо try-with-resources для безпеки
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, emp.getEmpl_surname());
+            stmt.setString(2, emp.getEmpl_name());
+            stmt.setString(3, emp.getEmpl_patronymic());
+            stmt.setString(4, emp.getEmpl_role());
+            stmt.setDouble(5, emp.getSalary());
+            stmt.setString(6, emp.getDate_of_birth());
+            stmt.setString(7, emp.getDate_of_start());
+            stmt.setString(8, emp.getPhone_number());
+            stmt.setString(9, emp.getCity());
+            stmt.setString(10, emp.getStreet());
+            stmt.setString(11, emp.getZip_code());
+            stmt.setString(12, emp.getEmpl_password());
+            stmt.setString(13, emp.getId_employee());
+
+            stmt.executeUpdate();
+        }
     }
 
     private EmployeeDBModel mapEmployee(ResultSet rs) throws SQLException {
