@@ -44,27 +44,62 @@ public class AddCustomerCardController {
     }
 
     private void handleSave() {
-        String surname    = view.getSurname();
-        String name       = view.getName();
-        String patronymic = view.getPatronymic();
-        String cardNumber = view.getCardNumber();
-        String phone      = view.getPhone();
-        String city =       view.getCity();
-        String street =   view.getStreet();
-        String zip =       view.getZip();
-        String discountStr = view.getDiscount();
+        // Рекомендую додавати .trim() щоб випадково не зберегти пробіли замість тексту
+        String surname    = view.getSurname().trim();
+        String name       = view.getName().trim();
+        String patronymic = view.getPatronymic().trim();
+        String cardNumber = view.getCardNumber(); // Це поле ми перезапишемо нижче
+        String phone      = view.getPhone().trim();
+        String city       = view.getCity().trim();
+        String street     = view.getStreet().trim();
+        String zip        = view.getZip().trim();
+        String discountStr = view.getDiscount().trim();
 
+        // ── 1. Перевірки на обов'язкові поля ────────────────────────────────
         if (surname.isEmpty() || name.isEmpty()) {
             error("Прізвище та ім'я є обов'язковими");
             return;
         }
         if (patronymic.isEmpty()) {
             error("По батькові обов'язкове");
+            return; // ВИПРАВЛЕНО: Додано return
         }
         if (city.isEmpty() || street.isEmpty() || zip.isEmpty()) {
             error("Адресна інформація обов'язкова");
+            return; // ВИПРАВЛЕНО: Додано return
         }
 
+        // ── 2. Перевірки на довжину (згідно з БД) ───────────────────────────
+        if (surname.length() > 50) {
+            error("Прізвище не може перевищувати 50 символів");
+            return;
+        }
+        if (name.length() > 50) {
+            error("Ім'я не може перевищувати 50 символів");
+            return;
+        }
+        if (patronymic.length() > 50) {
+            error("По батькові не може перевищувати 50 символів");
+            return;
+        }
+        if (city.length() > 50) {
+            error("Місто не може перевищувати 50 символів");
+            return;
+        }
+        if (street.length() > 50) {
+            error("Вулиця не може перевищувати 50 символів");
+            return;
+        }
+        if (zip.length() > 9) {
+            error("Індекс не може перевищувати 9 символів");
+            return;
+        }
+        if (phone.length() > 13) {
+            error("Телефон не може перевищувати 13 символів");
+            return;
+        }
+
+        // ── 3. Перевірка формату телефону та знижки ─────────────────────────
         if (!phone.matches("\\+?[0-9\\-\\s]{7,13}")) {
             error("Введіть коректний номер телефону");
             return;
@@ -75,25 +110,22 @@ public class AddCustomerCardController {
             discount = Integer.parseInt(discountStr);
             if (discount < 0 || discount > 100) throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            error("Знижка має бути числом від 0 до 100"); return;
+            error("Знижка має бути числом від 0 до 100");
+            return;
         }
 
+        // ── 4. Формування номера картки та збереження ───────────────────────
         if (mode == Mode.EDIT) {
             cardNumber = original.getCard_number();
         } else {
+            // Якщо генератор видає більше ніж 13 символів, БД видасть помилку.
+            // Переконайтеся, що service.generateCardNumber() генерує <= 13 символів.
             cardNumber = service.generateCardNumber();
         }
 
-        /*
-        (String card_number, String cust_name, String cust_surname,
-                         String cust_patronymic, String phone_number, String city,
-                         String street, String zip_code, int percent
-         */
-
-       CustomerCardDBModel card = new CustomerCardDBModel(
-                cardNumber, name, surname, patronymic,phone, city, street, zip, discount
+        CustomerCardDBModel card = new CustomerCardDBModel(
+                cardNumber, name, surname, patronymic, phone, city, street, zip, discount
         );
-
 
         try {
             if (mode == Mode.ADD) {
