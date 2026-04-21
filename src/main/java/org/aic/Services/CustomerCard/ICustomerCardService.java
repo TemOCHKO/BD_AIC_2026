@@ -12,5 +12,7 @@ public interface ICustomerCardService {
     List<CustomerCardDBModel> getCustomerBySurname(String surname);
     List<CustomerCardDBModel> getCustomersByPercent(int percent);
     boolean updateCustomerCard(CustomerCardDBModel c);
+    CustomerCardDBModel getCustomerByCardNumber(String cardNumber);
+    String generateCardNumber();
 
 }

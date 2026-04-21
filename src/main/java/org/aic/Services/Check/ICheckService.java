@@ -8,4 +8,5 @@ import java.util.List;
 public interface ICheckService {
     List<CheckDBModel> getAllChecks();
     boolean deleteCheck(String checkNumber);
+    void saveCheck(CheckDBModel check);
 }

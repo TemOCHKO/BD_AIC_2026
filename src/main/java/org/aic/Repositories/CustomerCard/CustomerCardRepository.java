@@ -1,6 +1,7 @@
 package org.aic.Repositories.CustomerCard;
 
 import org.aic.DBModels.CustomerCardDBModel;
+import org.aic.DBModels.EmployeeDBModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -103,6 +104,21 @@ public class CustomerCardRepository implements ICustomerCardRepository {
         }
         return list;
     }
+
+    @Override
+    public CustomerCardDBModel getCustomerByCardNumber(String cardNumber) throws SQLException {
+        String sql = "SELECT * FROM Customer_Card WHERE card_number = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, cardNumber);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            return mapCustomer(rs);
+        }
+        return null;
+    }
+
     public List<CustomerCardDBModel> getCustomersByPercent(int percent) throws SQLException {
         List<CustomerCardDBModel> list = new ArrayList<>();
         String sql = "SELECT * FROM Customer_Card WHERE percent = ?";
@@ -166,5 +182,19 @@ public class CustomerCardRepository implements ICustomerCardRepository {
             stmt.setString(9, c.getCard_number());
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    private CustomerCardDBModel mapCustomer(ResultSet rs) throws SQLException {
+        return new CustomerCardDBModel(
+                rs.getString("card_number"),
+                rs.getString("cust_name"),
+                rs.getString("cust_surname"),
+                rs.getString("cust_patronymic"),
+                rs.getString("phone_number"),
+                rs.getString("city"),
+                rs.getString("street"),
+                rs.getString("zip_code"),
+                rs.getInt("percent")
+        );
     }
 }

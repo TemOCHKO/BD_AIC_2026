@@ -15,7 +15,6 @@ public class ProductService implements IProductService {
     private final IProductRepository productRepository;
     private final ICategoryRepository categoryRepository;
 
-    // TODO Maybe better to do with joins right on products?
     public HashMap<Integer, String> categoryMap;
 
     public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository) {
@@ -37,13 +36,10 @@ public class ProductService implements IProductService {
     public Iterable<ProductTableDTO> getAllDTOProducts() {
         var prods = getAllProducts();
         var dtos = new ArrayList<ProductTableDTO>();
-
         for (var prod : prods) {
             String categoryName = categoryMap.get(prod.getCategoryNumber());
-
             dtos.add(new ProductTableDTO(prod.getId(), prod.getDbId(), prod.getTitle(), prod.getManufacturer(), categoryName));
         }
-
         return dtos;
     }
 
@@ -77,6 +73,30 @@ public class ProductService implements IProductService {
         }
     }
 
+    /**
+     * п.4 — Пошук товарів за назвою (часткове співпадіння, регістронезалежний).
+     */
+    @Override
+    public List<ProductDBModel> getProductsByName(String name) {
+        try {
+            return productRepository.getProductsByName(name);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * п.5 — Пошук товарів певної категорії, відсортованих за назвою.
+     */
+    @Override
+    public List<ProductDBModel> getProductsByCategorySortedByName(int categoryNumber) {
+        try {
+            return productRepository.getProductsByCategorySortedByName(categoryNumber);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public HashMap<Integer, String> getCategoryMap() {
         try {
             return categoryRepository.getCategoryMap();
@@ -84,6 +104,4 @@ public class ProductService implements IProductService {
             throw new RuntimeException(e);
         }
     }
-
 }
-

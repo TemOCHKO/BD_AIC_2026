@@ -5,6 +5,7 @@ import org.aic.Repositories.CustomerCard.ICustomerCardRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class CustomerCardService implements ICustomerCardService{
 
@@ -23,7 +24,11 @@ public class CustomerCardService implements ICustomerCardService{
 
     @Override
     public void addCustomerCard(CustomerCardDBModel c) {
-
+        try {
+            customerCardRepository.addCustomerCard(c);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -60,5 +65,19 @@ public class CustomerCardService implements ICustomerCardService{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public CustomerCardDBModel getCustomerByCardNumber(String cardNumber) {
+        try {
+            return customerCardRepository.getCustomerByCardNumber(cardNumber);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String generateCardNumber() {
+        return "CRD-" + UUID.randomUUID().toString().replace("-", "").substring(0, 5);
     }
 }

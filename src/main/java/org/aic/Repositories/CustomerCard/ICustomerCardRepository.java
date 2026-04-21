@@ -10,6 +10,7 @@ public interface ICustomerCardRepository {
     List<CustomerCardDBModel> getAllCustomerCards() throws SQLException;
     boolean deleteCustomerCard(String cardNumber) throws SQLException;
     List<CustomerCardDBModel> getCustomerBySurname(String surname) throws SQLException;
+    CustomerCardDBModel getCustomerByCardNumber(String cardNumber) throws SQLException;
     List<CustomerCardDBModel> getCustomersByPercent(int percent) throws SQLException;
     boolean updateCustomerCard(CustomerCardDBModel c) throws SQLException;
 }

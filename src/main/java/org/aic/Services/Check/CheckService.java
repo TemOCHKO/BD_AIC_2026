@@ -29,4 +29,13 @@ public class CheckService implements ICheckService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void saveCheck(CheckDBModel check) {
+        try {
+            repository.addCheck(check);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

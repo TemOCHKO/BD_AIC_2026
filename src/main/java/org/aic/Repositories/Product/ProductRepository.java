@@ -101,4 +101,42 @@ public class ProductRepository implements IProductRepository {
             connection.setAutoCommit(true);
         }
     }
+    // Пошук товарів за назвою (часткове співпадіння)
+    public List<ProductDBModel> getProductsByName(String name) throws SQLException {
+        List<ProductDBModel> list = new ArrayList<>();
+        String sql = "SELECT * FROM Product WHERE product_name LIKE ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, "%" + name + "%");
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            list.add(new ProductDBModel(
+                    rs.getInt("id_product"),
+                    rs.getString("product_name"),
+                    rs.getString("producer"),
+                    rs.getString("characteristics"),
+                    rs.getInt("category_number")
+            ));
+        }
+        return list;
+    }
+
+    // Пошук товарів певної категорії, відсортованих за назвою
+    public List<ProductDBModel> getProductsByCategorySortedByName(int categoryNumber) throws SQLException {
+        List<ProductDBModel> list = new ArrayList<>();
+        String sql = "SELECT * FROM Product WHERE category_number = ? ORDER BY product_name ASC";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, categoryNumber);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            list.add(new ProductDBModel(
+                    rs.getInt("id_product"),
+                    rs.getString("product_name"),
+                    rs.getString("producer"),
+                    rs.getString("characteristics"),
+                    rs.getInt("category_number")
+            ));
+        }
+        return list;
+    }
+
 }

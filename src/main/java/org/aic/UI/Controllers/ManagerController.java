@@ -31,6 +31,7 @@ import org.aic.UI.Views.TableModels.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -44,6 +45,8 @@ public class ManagerController {
     private final ICheckService checkService;
     private final ICustomerCardService customerCardService;
     private EmployeesController employeesController;
+    private AddCustomerCardController addCustomerCardController;
+    private CheckController checkController;
     public ManagerController(ManagerFrame managerFrame, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService, ICheckService checkService, ICustomerCardService customerCardService) {
         this.managerView = managerFrame;
         this.employeeService = employeeService;
@@ -91,6 +94,7 @@ public class ManagerController {
         managerView.getDeleteButton().addActionListener(e -> handleDeleteAction());
         managerView.getAddButton().addActionListener(e -> handleAddAction());
         managerView.getEditButton().addActionListener(e -> handleEditAction());
+        managerView.getSearchField().addActionListener(e -> handleSearch());
         // Example of where you will bind other UI actions:
         // Using an ItemListener (Recommended for Checkboxes)
         initEmployeeController();
@@ -161,10 +165,6 @@ public class ManagerController {
 
     }
 
-    private void initProductController() {
-
-    }
-
     /**
      * Handles the logic of switching tabs: updating UI state, changing columns,
      * and managing specific component visibility.
@@ -220,6 +220,8 @@ public class ManagerController {
                 var customerList = customerCardService.getAllCustomerCards();
                 CustomerCardFullTableModel customerCardFullTableModel = new CustomerCardFullTableModel(customerList);
                 managerView.getTable().setModel(customerCardFullTableModel);
+
+                initClientController();
 
                 managerView.styleTable();
                 break;
@@ -342,6 +344,14 @@ public class ManagerController {
                 employeesController.showAddEmployeeDialog();
 
                 handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
+                break;
+            }
+            case ManagerFrame.TAB_CLIENTS -> {
+                addCustomerCardController = new AddCustomerCardController(null, customerCardService);
+                addCustomerCardController.show();
+
+                handleTabSwitch(ManagerFrame.TAB_CLIENTS);
+                break;
             }
         }
     }
@@ -366,6 +376,22 @@ public class ManagerController {
                 employeesController.showEditEmployeeDialog();
 
                 handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);
+                break;
+            }
+            case ManagerFrame.TAB_CLIENTS -> {
+                CustomerCardFullTableModel model = (CustomerCardFullTableModel) managerView.getTable().getModel();
+                addCustomerCardController = new AddCustomerCardController(null, customerCardService, model.getClientAt(selectedRow));
+                addCustomerCardController.show();
+
+                handleTabSwitch(ManagerFrame.TAB_CLIENTS);
+                break;
+            }
+            case ManagerFrame.TAB_RECEIPTS -> {
+                checkController = new CheckController(null, checkService);
+                checkController.show();
+
+                handleTabSwitch(ManagerFrame.TAB_RECEIPTS);
+                break;
             }
         }
 
@@ -425,6 +451,134 @@ public class ManagerController {
 
     public ManagerFrame getManagerView() {
         return managerView;
+    }
+
+    // ═══════════════════════════════════════════════
+    // ПОШУК (п.4 — за назвою товару, п.6 — за прізвищем клієнта)
+    // ═══════════════════════════════════════════════
+
+    /**
+     * Головний диспетчер пошуку — визначає що шукати залежно від активного табу.
+     */
+    private void handleSearch() {
+        int tab = managerView.getActiveTab();
+        String query = managerView.getSearchField().getText().trim();
+
+        if (tab == ManagerFrame.TAB_PRODUCTS) {
+            searchProductsByName(query);
+        } else if (tab == ManagerFrame.TAB_CLIENTS) {
+            searchClientsBySurname(query);
+        }
+    }
+
+    /**
+     * п.4 — Пошук товарів за назвою (часткове співпадіння).
+     * Якщо поле порожнє — показує всі товари.
+     */
+    private void searchProductsByName(String name) {
+        if (name.isEmpty()) {
+            var list = productService.getAllProducts();
+            managerView.getTable().setModel(new ProductFullTableModel(list));
+        } else {
+            var list = productService.getProductsByName(name);
+            managerView.getTable().setModel(new ProductFullTableModel(list));
+        }
+        managerView.styleTable();
+    }
+
+    /**
+     * п.6 — Пошук постійних клієнтів за прізвищем.
+     * Якщо поле порожнє — показує всіх клієнтів.
+     */
+    private void searchClientsBySurname(String surname) {
+        if (surname.isEmpty()) {
+            var list = customerCardService.getAllCustomerCards();
+            managerView.getTable().setModel(new CustomerCardFullTableModel(list));
+        } else {
+            var list = customerCardService.getCustomerBySurname(surname);
+            managerView.getTable().setModel(new CustomerCardFullTableModel(list));
+        }
+        managerView.styleTable();
+    }
+
+    /**
+     * п.5 — Пошук товарів певної категорії, відсортованих за назвою.
+     * п.4 — Пошук товарів за назвою (через searchField у хедері).
+     */
+    private void initProductController() {
+        // Заповнити дропдаун категорій
+        var categoryNames = productService.getCategoryMap().values().toArray(String[]::new);
+        managerView.setCategories(categoryNames);
+
+        // п.5 — кнопка "Фільтр за категорією"
+        managerView.getBtnFilterByCategory().addActionListener(e -> filterProductsByCategory());
+    }
+
+    /**
+     * п.5 — Фільтрація товарів за категорією, відсортованих за назвою.
+     */
+    private void filterProductsByCategory() {
+        String selected = (String) managerView.getCbProductCategory().getSelectedItem();
+
+        if (selected == null || selected.equals("Всі категорії")) {
+            // Показати всі товари
+            var list = productService.getAllProducts();
+            managerView.getTable().setModel(new ProductFullTableModel(list));
+            managerView.styleTable();
+            return;
+        }
+
+        // Знайти id категорії по назві
+        int categoryId = -1;
+        for (var entry : productService.getCategoryMap().entrySet()) {
+            if (entry.getValue().equals(selected)) {
+                categoryId = entry.getKey();
+                break;
+            }
+        }
+        if (categoryId == -1) return;
+
+        var list = productService.getProductsByCategorySortedByName(categoryId);
+        managerView.getTable().setModel(new ProductFullTableModel(list));
+        managerView.styleTable();
+    }
+
+    private void initClientController() {
+        // Очищаємо всі попередні слухачі, щоб уникнути дублювання
+        for (ActionListener al : managerView.getBtnFilterByDiscount().getActionListeners()) {
+            managerView.getBtnFilterByDiscount().removeActionListener(al);
+        }
+
+        // Додаємо слухача на кнопку "Фільтр"
+        managerView.getBtnFilterByDiscount().addActionListener(e -> filterClientsByDiscount());
+    }
+
+    private void filterClientsByDiscount() {
+        String discountText = managerView.getTxtDiscountFilter().getText().trim();
+
+        // Якщо поле порожнє або містить текст-підказку, показуємо всіх клієнтів
+        if (discountText.isEmpty() || discountText.equals("Знижка %")) {
+            var list = customerCardService.getAllCustomerCards();
+            managerView.getTable().setModel(new CustomerCardFullTableModel(list));
+            managerView.styleTable();
+            return;
+        }
+
+        try {
+            // Перетворюємо введений текст на число
+            int percent = Integer.parseInt(discountText);
+
+            // Викликаємо сервіс для отримання клієнтів з конкретною знижкою
+            var list = customerCardService.getCustomersByPercent(percent);
+
+            // Оновлюємо таблицю
+            managerView.getTable().setModel(new CustomerCardFullTableModel(list));
+            managerView.styleTable();
+
+        } catch (NumberFormatException ex) {
+            // Якщо користувач ввів літери замість цифр
+            showInputErrorMessage("Будь ласка, введіть коректне число (відсоток) для фільтрації.");
+        }
     }
 
 
