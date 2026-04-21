@@ -35,4 +35,22 @@ public class StoreProductService implements IStoreProductService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean updateStoreProduct(StoreProductDBModel sp) {
+        try {
+            return storeProductRepository.updateStoreProduct(sp);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void addStoreProduct(StoreProductDBModel sp) {
+        try {
+            storeProductRepository.addStoreProduct(sp);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

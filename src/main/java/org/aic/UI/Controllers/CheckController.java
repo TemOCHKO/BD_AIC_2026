@@ -2,147 +2,49 @@ package org.aic.UI.Controllers;
 
 import org.aic.DBModels.CheckDBModel;
 import org.aic.Services.Check.ICheckService;
-import org.aic.UI.Views.CheckView;
+import org.aic.UI.Views.CheckDialog;
+import org.aic.UI.Views.ManagerFrame;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class CheckController {
 
-    private final CheckView    view;
-    private final ICheckService service;
+    private final ManagerController parent;
+    private final ICheckService checkService;
+    private CheckDialog dialog;
 
-    // товари в поточному чеку: {upc, name, qty, price}
-    private final List<Object[]> items = new ArrayList<>();
-
-    private double discountPct = 0.0;
-
-    public CheckController(Frame owner, ICheckService service) {
-        this.service = service;
-        this.view    = new CheckView(owner);
-
-        view.getAddProductButton().addActionListener(e -> handleAddProduct());
-        view.getIssueButton().addActionListener(e -> handleIssue());
+    public CheckController(ManagerController parent, ICheckService checkService) {
+        this.parent = parent;
+        this.checkService = checkService;
     }
 
-    // ── Додати товар у чек ────────────────────────────────────────
-    private void handleAddProduct() {
-        String upc = view.getUPC();
-        if (upc.isEmpty()) {
-            error("Введіть UPC товару"); return;
-        }
+    public void showEditDialog(CheckDBModel checkToEdit) {
+        dialog = new CheckDialog(parent.getManagerView(), "Редагування чека");
+        dialog.setData(checkToEdit);
 
-        // Запитуємо кількість
-        String qtyStr = JOptionPane.showInputDialog(view, "Кількість:", "Додати товар", JOptionPane.PLAIN_MESSAGE);
-        if (qtyStr == null) return;
+        dialog.getBtnCancel().addActionListener(e -> dialog.dispose());
+        dialog.getBtnSave().addActionListener(e -> handleSave(checkToEdit));
 
-        int qty;
+        dialog.setVisible(true);
+    }
+
+    private void handleSave(CheckDBModel check) {
         try {
-            qty = Integer.parseInt(qtyStr.trim());
-            if (qty <= 0) throw new NumberFormatException();
-        } catch (NumberFormatException e) {
-            error("Кількість має бути цілим додатнім числом"); return;
-        }
+            String newCardNumber = dialog.getCardNumber();
 
-        // TODO: отримати назву і ціну з ProductService за UPC
-        // Поки що — заглушка, підстав свій ProductService
-        String name  = "Товар " + upc; // замінити на реальне
-        double price = 0.0;            // замінити на реальне
+            // Оновлюємо модель
+            // Якщо поле порожнє, передаємо null у базу даних (картка не використана)
+            check.setCard_number(newCardNumber.isEmpty() ? null : newCardNumber);
 
-        items.add(new Object[]{upc, name, qty, price});
-        view.addRow(upc, name, qty, price);
-        recalculate();
-    }
+            // TODO: Викличте метод вашого сервісу для оновлення в базі:
+            // checkService.updateCheck(check);
 
-    // ── Перерахувати підсумок ─────────────────────────────────────
-    private void recalculate() {
-        double subtotal = items.stream()
-                .mapToDouble(r -> (int) r[2] * (double) r[3])
-                .sum();
+            dialog.dispose();
+            parent.handleTabSwitch(ManagerFrame.TAB_RECEIPTS); // Оновлюємо таблицю
+            JOptionPane.showMessageDialog(parent.getManagerView(), "Чек успішно оновлено!");
 
-        // знижка з карти клієнта (якщо є)
-        // TODO: отримати знижку з CustomerCardService за номером карти
-        discountPct = 0.0; // замінити на реальне
-
-        double discount = subtotal * discountPct / 100.0;
-        double total    = subtotal - discount;
-        double vat      = total * 0.20; // ПДВ 20%
-
-        view.setVAT(vat);
-        view.setDiscount(discountPct);
-        view.setTotal(total);
-    }
-
-    // ── Видати чек ────────────────────────────────────────────────
-    private void handleIssue() {
-        if (items.isEmpty()) {
-            error("Додайте хоча б один товар"); return;
-        }
-
-        double subtotal = items.stream()
-                .mapToDouble(r -> (int) r[2] * (double) r[3])
-                .sum();
-        double discount = subtotal * discountPct / 100.0;
-        double total    = subtotal - discount;
-        double vat      = total * 0.20;
-
-        String checkNumber = "CHK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        CheckDBModel check = new CheckDBModel(
-                checkNumber,
-                null,          // id касира — передай через конструктор або сесію
-                view.getCardNumber().isEmpty() ? null : view.getCardNumber(),
-                now,
-                total,
-                vat
-        );
-
-        try {
-            service.saveCheck(check);
-            JOptionPane.showMessageDialog(view,
-                    "Чек " + checkNumber + " видано!\nСума: " + String.format("%.2f грн", total),
-                    "Успіх", JOptionPane.INFORMATION_MESSAGE);
-            view.dispose();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            error("Помилка БД: " + ex.getMessage());
+            JOptionPane.showMessageDialog(dialog, "Помилка збереження: " + ex.getMessage());
         }
     }
-
-    // ── Видалення чека (статично, з таблиці переліку) ─────────────
-    public static void deleteCheck(Component parent,
-                                   ICheckService service,
-                                   String checkNumber) {
-        if (checkNumber == null || checkNumber.isBlank()) {
-            JOptionPane.showMessageDialog(parent, "Оберіть чек для видалення",
-                    "Помилка", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        int confirm = JOptionPane.showConfirmDialog(parent,
-                "Видалити чек " + checkNumber + "?",
-                "Підтвердження", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
-        boolean deleted = service.deleteCheck(checkNumber);
-        if (deleted) {
-            JOptionPane.showMessageDialog(parent, "Чек видалено!");
-        } else {
-            JOptionPane.showMessageDialog(parent, "Чек не знайдено",
-                    "Помилка", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void error(String msg) {
-        JOptionPane.showMessageDialog(view, msg, "Помилка", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void show() { view.setVisible(true); }
 }

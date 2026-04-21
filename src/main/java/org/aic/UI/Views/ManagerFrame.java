@@ -1,5 +1,8 @@
 package org.aic.UI.Views;
 
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
@@ -74,8 +77,8 @@ public class ManagerFrame extends JFrame {
 
     // Чеки
     private JComboBox<String> cbCashier;        // "Всі касири" або конкретний
-    private JTextField        txtDateFrom;
-    private JTextField        txtDateTo;
+    private DatePicker dpDateFrom;
+    private DatePicker  dpDateTo;
     private JButton           btnFilterReceipts;
     private JButton           btnTotalByCashier;
     private JButton           btnTotalAll;
@@ -294,30 +297,32 @@ public class ManagerFrame extends JFrame {
             }
 
             case TAB_RECEIPTS -> {
-                // п.17-21: касир, діапазон дат, суми
                 cbCashier = new JComboBox<>();
                 cbCashier.addItem("Всі касири");
                 styleCombo(cbCashier, 160);
 
-                txtDateFrom = makeFilterTextField("від дд.мм.рррр", 110);
-                txtDateTo   = makeFilterTextField("до дд.мм.рррр",  110);
+                // Налаштування для першого DatePicker
+                DatePickerSettings settingsFrom = new DatePickerSettings();
+                settingsFrom.setFormatForDatesCommonEra("yyyy-MM-dd"); // Формат бази даних SQL
+                dpDateFrom = new DatePicker(settingsFrom);
+
+                // Налаштування для другого DatePicker
+                DatePickerSettings settingsTo = new DatePickerSettings();
+                settingsTo.setFormatForDatesCommonEra("yyyy-MM-dd");
+                dpDateTo = new DatePicker(settingsTo);
 
                 btnFilterReceipts  = makeFilterButton("Показати чеки");
-                btnTotalByCashier  = makeFilterButton("Σ Касира");
-                btnTotalAll        = makeFilterButton("Σ Всіх");
-                btnProductQty      = makeFilterButton("К-сть товару");
+
+                // ... інші кнопки ...
 
                 panel.add(filterLabel("Касир:"));
                 panel.add(cbCashier);
                 panel.add(filterLabel("Період:"));
-                panel.add(txtDateFrom);
+                panel.add(dpDateFrom); // Додаємо DatePicker
                 panel.add(filterLabel("—"));
-                panel.add(txtDateTo);
+                panel.add(dpDateTo);   // Додаємо DatePicker
                 panel.add(btnFilterReceipts);
-                panel.add(Box.createHorizontalStrut(8));
-                panel.add(btnTotalByCashier);
-                panel.add(btnTotalAll);
-                panel.add(btnProductQty);
+                // ... додавання інших кнопок ...
             }
 
             case TAB_CLIENTS -> {
@@ -535,8 +540,8 @@ public class ManagerFrame extends JFrame {
 
     // Receipts filter
     public JComboBox<String> getCbCashier()         { return cbCashier; }
-    public JTextField        getTxtDateFrom()        { return txtDateFrom; }
-    public JTextField        getTxtDateTo()          { return txtDateTo; }
+    public DatePicker        getDpDateFrom()        { return dpDateFrom; }
+    public DatePicker        getDpDateTo()          { return dpDateTo; }
     public JButton           getBtnFilterReceipts()  { return btnFilterReceipts; }
     public JButton           getBtnTotalByCashier()  { return btnTotalByCashier; }
     public JButton           getBtnTotalAll()        { return btnTotalAll; }

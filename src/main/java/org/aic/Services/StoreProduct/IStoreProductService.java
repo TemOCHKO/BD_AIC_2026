@@ -8,4 +8,6 @@ import java.util.List;
 public interface IStoreProductService {
     List<StoreProductDBModel> getAllSortedByName();
     boolean deleteStoreProduct(String upc) throws IllegalAccessException;
+    boolean updateStoreProduct(StoreProductDBModel sp) ;
+    void addStoreProduct(StoreProductDBModel sp);
 }

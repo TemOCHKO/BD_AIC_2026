@@ -36,7 +36,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.Collator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -221,6 +225,8 @@ public class ManagerController {
                 CheckFullTableModel checkFullTableModel = new CheckFullTableModel(checkList);
                 managerView.getTable().setModel(checkFullTableModel);
 
+                initReceiptController();
+
                 managerView.styleTable();
                 break;
             case ManagerFrame.TAB_CLIENTS:
@@ -367,6 +373,11 @@ public class ManagerController {
                 handleTabSwitch(ManagerFrame.TAB_PRODUCTS);
                 break;
             }
+            case ManagerFrame.TAB_STORE -> {
+                StoreProductController spCtrl = new StoreProductController(this, storeProductService, productService);
+                spCtrl.showAddDialog();
+                break;
+            }
         }
     }
 
@@ -401,8 +412,9 @@ public class ManagerController {
                 break;
             }
             case ManagerFrame.TAB_RECEIPTS -> {
-                checkController = new CheckController(null, checkService);
-                checkController.show();
+                CheckFullTableModel model = (CheckFullTableModel) managerView.getTable().getModel();
+                checkController = new CheckController(this, checkService);
+                checkController.showEditDialog(model.getCheckAt(selectedRow));
 
                 handleTabSwitch(ManagerFrame.TAB_RECEIPTS);
                 break;
@@ -413,6 +425,14 @@ public class ManagerController {
 
                 ProductsController prodController = new ProductsController(this, productService);
                 prodController.showEditDialog(selectedProd);
+                break;
+            }
+            case ManagerFrame.TAB_STORE -> {
+                StoreProductFullTableModel model = (StoreProductFullTableModel) managerView.getTable().getModel();
+                StoreProductDBModel selected = model.getStoreProductAt(selectedRow);
+
+                StoreProductController spCtrl = new StoreProductController(this, storeProductService, productService);
+                spCtrl.showEditDialog(selected);
                 break;
             }
         }
@@ -667,5 +687,59 @@ public class ManagerController {
         java.util.List<StoreProductDBModel> filteredList = stream.collect(Collectors.toList());
         managerView.getTable().setModel(new StoreProductFullTableModel(filteredList));
         managerView.styleTable(); // Відновлюємо дизайн таблиці
+    }
+
+    private void initReceiptController() {
+        // Очищаємо попередні слухачі
+        for (java.awt.event.ActionListener al : managerView.getBtnFilterReceipts().getActionListeners()) {
+            managerView.getBtnFilterReceipts().removeActionListener(al);
+        }
+
+        managerView.getBtnFilterReceipts().addActionListener(e -> filterReceipts());
+    }
+
+    private void filterReceipts() {
+        List<CheckDBModel> allChecks = checkService.getAllChecks();
+        Stream<CheckDBModel> stream = allChecks.stream();
+
+        // 1. Фільтр за касиром
+        String selectedCashier = (String) managerView.getCbCashier().getSelectedItem();
+        if (selectedCashier != null && !selectedCashier.equals("Всі касири")) {
+            stream = stream.filter(c -> c.getId_employee().equals(selectedCashier));
+        }
+
+        // 2. Отримуємо значення з LGoodDatePicker
+        LocalDate dateFrom = managerView.getDpDateFrom().getDate();
+        LocalDate dateTo = managerView.getDpDateTo().getDate();
+
+        // 3. Фільтрація за датами
+        stream = stream.filter(c -> {
+            try {
+                // ВИПРАВЛЕНО: Використовуємо java.sql.Timestamp, він "пробачає" всі SQL-формати!
+                LocalDate checkDate = java.sql.Timestamp.valueOf(c.getPrint_date()).toLocalDateTime().toLocalDate();
+
+                // Перевірка "ВІД"
+                if (dateFrom != null && checkDate.isBefore(dateFrom)) {
+                    return false;
+                }
+
+                // Перевірка "ДО"
+                if (dateTo != null && checkDate.isAfter(dateTo)) {
+                    return false;
+                }
+
+                return true; // Дата підходить!
+
+            } catch (IllegalArgumentException e) {
+                // Якщо дата зовсім бита, пропускаємо цей чек і виводимо помилку
+                System.err.println("Помилка дати чека: " + c.getPrint_date());
+                return false;
+            }
+        });
+
+        // 4. Оновлюємо таблицю
+        List<CheckDBModel> filteredChecks = stream.collect(Collectors.toList());
+        managerView.getTable().setModel(new CheckFullTableModel(filteredChecks));
+        managerView.styleTable();
     }
 }
