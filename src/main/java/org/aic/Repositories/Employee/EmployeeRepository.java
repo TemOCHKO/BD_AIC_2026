@@ -165,7 +165,8 @@ public class EmployeeRepository implements IEmployeeRepository {
                 rs.getString("phone_number"),
                 rs.getString("city"),
                 rs.getString("street"),
-                rs.getString("zip_code")
+                rs.getString("zip_code"),
+                rs.getString("empl_password")
         );
     }
     //пошук за прізвищем
@@ -189,7 +190,8 @@ public class EmployeeRepository implements IEmployeeRepository {
                     rs.getString("phone_number"),
                     rs.getString("city"),
                     rs.getString("street"),
-                    rs.getString("zip_code")
+                    rs.getString("zip_code"),
+                    rs.getString("empl_password")
             ));
         }
         return list;
@@ -217,7 +219,8 @@ public class EmployeeRepository implements IEmployeeRepository {
                     rs.getString("phone_number"),
                     rs.getString("city"),
                     rs.getString("street"),
-                    rs.getString("zip_code")
+                    rs.getString("zip_code"),
+                    rs.getString("empl_password")
             );
         }
         return null;

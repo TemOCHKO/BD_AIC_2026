@@ -18,8 +18,8 @@ public class EmployeesController {
     public EmployeesController(ManagerController manager, IEmployeeService employeeService) {
         this.manager = manager;
         this.employeeService = employeeService;
-        addEmployeeView = new AddEmpl(null);
-        editEmployeeView = new AddEmpl(null);
+        addEmployeeView = new AddEmpl(null, true);
+        editEmployeeView = new AddEmpl(null, false);
         editEmployeeView.getSaveButton().setText("Update");
         editEmployeeView.getTitleLabel().setText("Редагувати працівника");
         initControllers();
@@ -119,6 +119,34 @@ public class EmployeesController {
             return;
         }
 
+        // ── Додатково валідуємо пароль ────────────────────────────
+        if (!addEmployeeView.validatePassword()) return;
+
+        // ── Хешуємо пароль через BCrypt ───────────────────────────
+        String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(
+                addEmployeeView.getPassword(),
+                org.mindrot.jbcrypt.BCrypt.gensalt(12)
+        );
+
+        // ── Зберігаємо в БД ───────────────────────────────────────
+        employeeService.saveNewEmployee(new EmployeeDBModel(
+                addEmployeeView.getSurnameField().getText().trim(),
+                addEmployeeView.getNameField().getText().trim(),
+                addEmployeeView.getPatronymicField().getText().trim(),
+                addEmployeeView.getRoleField().getSelectedItem().toString().trim(),
+                salary,
+                convertToDBDateString(addEmployeeView.getDobField()),
+                convertToDBDateString(addEmployeeView.getDosField()),
+                addEmployeeView.getPhoneField().getText().trim(),
+                addEmployeeView.getCityField().getText().trim(),
+                addEmployeeView.getStreetField().getText().trim(),
+                addEmployeeView.getZipField().getText().trim(),
+                hashedPassword  // ← передаємо хеш, не plain text!
+        ));
+
+        setEverytingToDefaultAndExit();
+
+
         employeeService.saveNewEmployee(new EmployeeDBModel(addEmployeeView.getSurnameField().getText(),
                 addEmployeeView.getNameField().getText().trim(),
                 addEmployeeView.getPatronymicField().getText().trim(),
@@ -129,7 +157,8 @@ public class EmployeesController {
                 addEmployeeView.getPhoneField().getText().trim(),
                 addEmployeeView.getCityField().getText().trim(),
                 addEmployeeView.getStreetField().getText().trim(),
-                addEmployeeView.getZipField().getText().trim()
+                addEmployeeView.getZipField().getText().trim(),
+                addEmployeeView.getPassword().trim()
         ));
 
         setEverytingToDefaultAndExit();
@@ -224,7 +253,8 @@ public class EmployeesController {
                 editEmployeeView.getPhoneField().getText().trim(),
                 editEmployeeView.getCityField().getText().trim(),
                 editEmployeeView.getStreetField().getText().trim(),
-                editEmployeeView.getZipField().getText().trim()
+                editEmployeeView.getZipField().getText().trim(),
+                editEmployeeView.getPassword().trim()
         ));
 
         manager.handleTabSwitch(ManagerFrame.TAB_EMPLOYEES);

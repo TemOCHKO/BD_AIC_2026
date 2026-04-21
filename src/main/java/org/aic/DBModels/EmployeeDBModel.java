@@ -13,11 +13,12 @@ public class EmployeeDBModel {
     private String city;
     private String street;
     private String zip_code;
+    private String empl_password;
 
     public EmployeeDBModel(String id_employee, String empl_surname, String empl_name,
                     String empl_patronymic, String empl_role, double salary,
                     String date_of_birth, String date_of_start, String phone_number,
-                    String city, String street, String zipcode) {
+                    String city, String street, String zipcode, String empl_password) {
         this.id_employee = id_employee;
         this.empl_surname = empl_surname;
         this.empl_name = empl_name;
@@ -30,13 +31,14 @@ public class EmployeeDBModel {
         this.city = city;
         this.street = street;
         this.zip_code = zipcode;
+        this.empl_password = empl_password;
     }
 
     public EmployeeDBModel(String empl_surname, String empl_name,
                            String empl_patronymic, String empl_role, double salary,
                            String date_of_birth, String date_of_start, String phone_number,
-                           String city, String street, String zipcode) {
-        this("defaultId", empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zipcode);
+                           String city, String street, String zipcode, String empl_password) {
+        this("defaultId", empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zipcode, empl_password);
     }
 
 
@@ -117,5 +119,13 @@ public class EmployeeDBModel {
     @Override
     public String toString() {
         return "models.Employee: " + id_employee + " " + empl_surname + " " + empl_name+ "(" + empl_role + ")";
+    }
+
+    public String getEmpl_password() {
+        return empl_password;
+    }
+
+    public void setEmpl_password(String empl_password) {
+        this.empl_password = empl_password;
     }
 }

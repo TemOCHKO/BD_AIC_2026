@@ -5,53 +5,54 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class AddEmpl extends JDialog {
 
     // ── Colors ───────────────────────────────────────────────────────────────
-    private static final Color BG_HEADER     = new Color(0xD9D9D9); // світлий верх
+    private static final Color BG_HEADER     = new Color(0xD9D9D9);
     private static final Color HEADER_BORDER = new Color(0xD0, 0xD0, 0xD0);
-
-    private static final Color BG_BODY       = new Color(0x979797); // темний фон
-    private static final Color BG_CARD       = new Color(0xD9D9D9); // картка
-
+    private static final Color BG_BODY       = new Color(0x979797);
+    private static final Color BG_CARD       = new Color(0xD9D9D9);
     private static final Color BG_FIELD      = new Color(0x3A, 0x3A, 0x3A);
     private static final Color BG_FIELD_FOC  = new Color(0x4A, 0x4A, 0x4A);
-
-    private static final Color FG_LOGO       = new Color(0x1A, 0x1A, 0x1A);
     private static final Color FG_TITLE      = new Color(0x000000);
     private static final Color FG_LABEL      = new Color(0, 0, 0);
     private static final Color FG_FIELD      = new Color(0xFFFFFF);
-
     private static final Color FG_DIVIDER    = new Color(0x444444);
-
     private static final Color BTN_SAVE_BG   = new Color(0x5A, 0x5A, 0x5A);
     private static final Color BTN_SAVE_FG   = new Color(0xFFFFFF);
-
-    private static final Color BTN_CANCEL_BG = new Color(0xE0, 0xE0, 0xE0);
     private static final Color BTN_CANCEL_FG = new Color(0x3A, 0x3A, 0x3A);
     private static final Color BTN_CANCEL_BD = new Color(0xCCCCCC);
 
     // ── Fonts ────────────────────────────────────────────────────────────────
-    private static final Font FONT_LOGO  = new Font("Serif",     Font.BOLD,  20);
     private static final Font FONT_TITLE = new Font("Serif",     Font.PLAIN, 20);
     private static final Font FONT_LABEL = new Font("SansSerif", Font.PLAIN, 10);
     private static final Font FONT_FIELD = new Font("SansSerif", Font.PLAIN, 13);
     private static final Font FONT_BTN   = new Font("SansSerif", Font.PLAIN, 13);
 
-    // ── Fields ───────────────────────────────────────────────────────────────
+    // ── UI Fields ────────────────────────────────────────────────────────────
     JLabel title;
-    private JButton save;
-    private JButton cancel;
-    private JTextField       tfSurname, tfName, tfPatronymic;
+    private JButton           save;
+    private JButton           cancel;
+    private JTextField        tfSurname, tfName, tfPatronymic;
     private JComboBox<String> cbRole;
-    private JTextField       tfSalary;
-    private DatePicker         spBirth, spStart;
-    private JTextField       tfPhone, tfCity, tfStreet, tfZip;
+    private JTextField        tfSalary;
+    private JPasswordField    tfPassword;        // ← новий пароль
+    private JPasswordField    tfPasswordConfirm; // ← підтвердження пароля
+    private DatePicker        spBirth, spStart;
+    private JTextField        tfPhone, tfCity, tfStreet, tfZip;
+
+    // Режим: true = додавання (показуємо поля пароля),
+    //        false = редагування (поля пароля приховані)
+    private final boolean isAddMode;
 
     public AddEmpl(Frame owner) {
-        super(owner, "Додати нового працівника", true);
+        this(owner, true);
+    }
+
+    public AddEmpl(Frame owner, boolean isAddMode) {
+        super(owner, isAddMode ? "Додати нового працівника" : "Редагувати працівника", true);
+        this.isAddMode = isAddMode;
         buildUI();
         pack();
         setLocationRelativeTo(owner);
@@ -59,7 +60,6 @@ public class AddEmpl extends JDialog {
     }
 
     // ── Build UI ─────────────────────────────────────────────────────────────
-
     private void buildUI() {
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(BG_BODY);
@@ -91,9 +91,9 @@ public class AddEmpl extends JDialog {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(BG_CARD);
         card.setBorder(new EmptyBorder(10, 10, 22, 10));
-        card.setPreferredSize(new Dimension(500, 600));
+        card.setPreferredSize(new Dimension(500, isAddMode ? 700 : 620));
 
-        title = new JLabel("Додати нового працівника");
+        title = new JLabel(isAddMode ? "Додати нового працівника" : "Редагувати працівника");
         title.setFont(FONT_TITLE);
         title.setForeground(FG_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -101,16 +101,15 @@ public class AddEmpl extends JDialog {
         card.add(vGap(20));
 
         card.add(twoCol(
-                labeled("ПРІЗВИЩЕ", tfSurname    = darkField()),
-                labeled("ІМ'Я",     tfName       = darkField())
+                labeled("ПРІЗВИЩЕ", tfSurname = darkField()),
+                labeled("ІМ'Я",     tfName    = darkField())
         ));
         card.add(vGap(14));
 
         card.add(labeled("ПО БАТЬКОВІ", tfPatronymic = darkField()));
         card.add(vGap(14));
 
-        String[] roles = {"Manager", "Cashier"};
-        cbRole = new JComboBox<>(roles);
+        cbRole = new JComboBox<>(new String[]{"Manager", "Cashier"});
         styleCombo(cbRole);
         card.add(twoCol(
                 labeled("ПОСАДА",   cbRole),
@@ -120,13 +119,12 @@ public class AddEmpl extends JDialog {
 
         spBirth = new DatePicker();
         spStart = new DatePicker();
-
         spBirth.setDateToToday();
         spStart.setDateToToday();
 
         card.add(twoCol(
                 labeled("ДАТА НАРОДЖЕННЯ", spBirth),
-                labeled("ДАТА ПОЧАТКУ", spStart)
+                labeled("ДАТА ПОЧАТКУ",    spStart)
         ));
         card.add(vGap(18));
 
@@ -143,7 +141,22 @@ public class AddEmpl extends JDialog {
         card.add(vGap(14));
 
         card.add(labeled("ВУЛИЦЯ", tfStreet = darkField()));
-        card.add(vGap(22));
+        card.add(vGap(18));
+
+        // ── Поля пароля — тільки при додаванні ───────────────────
+        if (isAddMode) {
+            card.add(divider());
+            card.add(vGap(18));
+
+            tfPassword        = darkPasswordField();
+            tfPasswordConfirm = darkPasswordField();
+
+            card.add(twoCol(
+                    labeled("ПАРОЛЬ",              tfPassword),
+                    labeled("ПІДТВЕРДЖЕННЯ ПАРОЛЯ", tfPasswordConfirm)
+            ));
+            card.add(vGap(18));
+        }
 
         card.add(buildButtons());
         return card;
@@ -154,9 +167,8 @@ public class AddEmpl extends JDialog {
         p.setOpaque(false);
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        save = pillButton("Зберегти",  BTN_SAVE_BG, BTN_SAVE_FG,   true);
-        cancel = pillButton("Скасувати", BG_CARD,     BTN_CANCEL_FG, false);
-
+        save   = pillButton(isAddMode ? "Зберегти" : "Оновити", BTN_SAVE_BG, BTN_SAVE_FG, true);
+        cancel = pillButton("Скасувати", BG_CARD, BTN_CANCEL_FG, false);
         cancel.addActionListener(e -> dispose());
 
         p.add(save);
@@ -164,14 +176,33 @@ public class AddEmpl extends JDialog {
         return p;
     }
 
-    // ── Event handlers ────────────────────────────────────────────────────────
+    // ── Валідація пароля (викликається з контролера) ──────────────
+    public boolean validatePassword() {
+        if (!isAddMode) return true; // при редагуванні пароль не міняємо
 
-    private void onSave() {
+        String pass    = new String(tfPassword.getPassword()).trim();
+        String confirm = new String(tfPasswordConfirm.getPassword()).trim();
 
+        if (pass.isEmpty()) {
+            showError("Введіть пароль");
+            return false;
+        }
+        if (pass.length() < 4) {
+            showError("Пароль має бути не менше 4 символів");
+            return false;
+        }
+        if (!pass.equals(confirm)) {
+            showError("Паролі не співпадають");
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Помилка", JOptionPane.ERROR_MESSAGE);
     }
 
     // ── UI helpers ────────────────────────────────────────────────────────────
-
     private JPanel labeled(String text, JComponent field) {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -204,8 +235,7 @@ public class AddEmpl extends JDialog {
 
     private JTextField darkField() {
         JTextField tf = new JTextField() {
-            @Override
-            protected void paintComponent(Graphics g) {
+            @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(hasFocus() ? BG_FIELD_FOC : BG_FIELD);
@@ -224,34 +254,26 @@ public class AddEmpl extends JDialog {
         return tf;
     }
 
-    private JSpinner makeDateSpinner() {
-        JSpinner sp = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor ed = new JSpinner.DateEditor(sp, "dd.MM.yyyy");
-        sp.setEditor(ed);
-        sp.setValue(new Date());
-        sp.setBackground(BG_FIELD);
-        sp.setForeground(FG_FIELD);
-        sp.setFont(FONT_FIELD);
-        sp.setBorder(BorderFactory.createEmptyBorder());
-
-        JTextField tf = ed.getTextField();
-        tf.setBackground(BG_FIELD);
-        tf.setForeground(FG_FIELD);
-        tf.setCaretColor(FG_FIELD);
-        tf.setFont(FONT_FIELD);
-        tf.setBorder(new EmptyBorder(6, 12, 6, 4));
-        tf.setOpaque(true);
-
-        for (Component c : sp.getComponents()) {
-            if (c instanceof JButton btn) {
-                btn.setBackground(BG_FIELD);
-                btn.setForeground(FG_FIELD);
-                btn.setBorderPainted(false);
-                btn.setFocusPainted(false);
+    private JPasswordField darkPasswordField() {
+        JPasswordField pf = new JPasswordField() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(hasFocus() ? BG_FIELD_FOC : BG_FIELD);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
             }
-        }
-        sp.setPreferredSize(new Dimension(200, 40));
-        return sp;
+        };
+        pf.setFont(FONT_FIELD);
+        pf.setForeground(FG_FIELD);
+        pf.setCaretColor(FG_FIELD);
+        pf.setOpaque(false);
+        pf.setBorder(new EmptyBorder(8, 14, 8, 14));
+        pf.setBackground(BG_FIELD);
+        pf.setEchoChar('●');
+        pf.setPreferredSize(new Dimension(200, 40));
+        return pf;
     }
 
     private void styleCombo(JComboBox<String> cb) {
@@ -259,9 +281,8 @@ public class AddEmpl extends JDialog {
         cb.setBackground(BG_FIELD);
         cb.setForeground(FG_FIELD);
         cb.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected, boolean cellHasFocus) {
+            @Override public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                                    int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 setBackground(isSelected ? BG_FIELD_FOC : BG_FIELD);
                 setForeground(FG_FIELD);
@@ -275,8 +296,7 @@ public class AddEmpl extends JDialog {
 
     private JButton pillButton(String text, Color bg, Color fg, boolean filled) {
         JButton btn = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
+            @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 Color c = getModel().isPressed()  ? bg.darker()   :
@@ -313,79 +333,28 @@ public class AddEmpl extends JDialog {
         return sep;
     }
 
-    private Component vGap(int h) {
-        return Box.createVerticalStrut(h);
-    }
+    private Component vGap(int h) { return Box.createVerticalStrut(h); }
 
-    // ── Main ─────────────────────────────────────────────────────────────────
+    // ── Getters ──────────────────────────────────────────────────────────────
+    public JButton            getSaveButton()      { return save; }
+    public JButton            getCancelButton()    { return cancel; }
+    public JTextField         getSurnameField()    { return tfSurname; }
+    public JTextField         getNameField()       { return tfName; }
+    public JTextField         getPatronymicField() { return tfPatronymic; }
+    public JComboBox<String>  getRoleField()       { return cbRole; }
+    public JTextField         getSalaryField()     { return tfSalary; }
+    public JTextField         getPhoneField()      { return tfPhone; }
+    public JTextField         getCityField()       { return tfCity; }
+    public JTextField         getStreetField()     { return tfStreet; }
+    public JTextField         getZipField()        { return tfZip; }
+    public DatePicker         getDobField()        { return spBirth; }
+    public DatePicker         getDosField()        { return spStart; }
+    public JLabel             getTitleLabel()      { return title; }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-            catch (Exception ignored) {}
-
-            AddEmpl dialog = new AddEmpl(null);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setVisible(true);
-
-            System.exit(0);
-        });
-    }
-
-    public JButton getSaveButton() {
-        return save;
-    }
-
-    public JButton getCancelButton() {
-        return cancel;
-    }
-
-    public JTextField getSurnameField() {
-        return tfSurname;
-    }
-
-    public JTextField getNameField() {
-        return tfName;
-    }
-
-    public JTextField getPatronymicField() {
-        return tfPatronymic;
-    }
-
-    public JComboBox<String> getRoleField() {
-        return cbRole;
-    }
-
-    public JTextField getSalaryField() {
-        return tfSalary;
-    }
-
-    public JTextField getPhoneField() {
-        return tfPhone;
-    }
-
-    public JTextField getCityField() {
-        return tfCity;
-    }
-
-    public JTextField getStreetField() {
-        return tfStreet;
-    }
-
-    public JTextField getZipField() {
-        return tfZip;
-    }
-
-    public DatePicker getDobField() {
-        return spBirth;
-    }
-
-    public DatePicker getDosField() {
-        return spStart;
-    }
-
-    public JLabel getTitleLabel() {
-        return title;
+    // Пароль у вигляді plain text — одразу після отримання хешуємо в контролері!
+    public String getPassword() {
+        if (tfPassword == null) return null;
+        return new String(tfPassword.getPassword()).trim();
     }
 
     public void setEmployeeData(String surname, String name, String patronymic,
@@ -396,14 +365,22 @@ public class AddEmpl extends JDialog {
         tfPatronymic.setText(patronymic);
         cbRole.setSelectedItem(role);
         tfSalary.setText(salary);
-
-        if (dob != null) getDobField().setDate(dob);
-        if (dos != null) getDosField().setDate(dos);
-
+        if (dob != null) spBirth.setDate(dob);
+        if (dos != null) spStart.setDate(dos);
         tfPhone.setText(phone);
         tfCity.setText(city);
         tfStreet.setText(street);
         tfZip.setText(zip);
     }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+            catch (Exception ignored) {}
+            AddEmpl dialog = new AddEmpl(null, true);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setVisible(true);
+            System.exit(0);
+        });
+    }
 }
