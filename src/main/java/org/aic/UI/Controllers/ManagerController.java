@@ -35,6 +35,11 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ManagerController {
     private boolean isSurnameAscending = false;
@@ -206,6 +211,8 @@ public class ManagerController {
                 var storeProductList = storeProductService.getAllSortedByName();
                 StoreProductFullTableModel storeProductFullTableModel = new StoreProductFullTableModel(storeProductList);
                 managerView.getTable().setModel(storeProductFullTableModel);
+
+                initStoreController();
 
                 managerView.styleTable();
                 break;
@@ -597,4 +604,68 @@ public class ManagerController {
     }
 
 
+    private void initStoreController() {
+        // 1. Очищаємо попередні слухачі, щоб уникнути подвійних спрацьовувань
+        for (java.awt.event.ActionListener al : managerView.getCbStoreFilter().getActionListeners()) {
+            managerView.getCbStoreFilter().removeActionListener(al);
+        }
+        for (java.awt.event.ActionListener al : managerView.getCbStoreSort().getActionListeners()) {
+            managerView.getCbStoreSort().removeActionListener(al);
+        }
+        for (java.awt.event.ActionListener al : managerView.getBtnFindByUpc().getActionListeners()) {
+            managerView.getBtnFindByUpc().removeActionListener(al);
+        }
+
+        // 2. Вішаємо слухачів на зміну значення у випадних списках
+        managerView.getCbStoreFilter().addActionListener(e -> applyStoreFiltersAndSort());
+        managerView.getCbStoreSort().addActionListener(e -> applyStoreFiltersAndSort());
+
+        // 3. Вішаємо слухача на кнопку пошуку за UPC
+        managerView.getBtnFindByUpc().addActionListener(e -> applyStoreFiltersAndSort());
+    }
+
+    private void applyStoreFiltersAndSort() {
+        // 1. Отримуємо ВЕСЬ список товарів магазину з бази даних
+        // (Використовуємо існуючий метод сервісу)
+        java.util.List<StoreProductDBModel> allStoreProducts = storeProductService.getAllSortedByName();
+
+        // 2. Зчитуємо поточний стан UI-елементів
+        int filterIndex = managerView.getCbStoreFilter().getSelectedIndex(); // 0: Всі, 1: Акційні, 2: Не акційні
+        int sortIndex = managerView.getCbStoreSort().getSelectedIndex();     // 0: За назвою, 1: За к-стю
+        String upcQuery = managerView.getTxtUpc().getText().trim();
+
+        // 3. Відкриваємо Stream для поєднання всіх фільтрів
+        Stream<StoreProductDBModel> stream = allStoreProducts.stream();
+
+        // --- Крок А: Пошук за UPC ---
+        if (!upcQuery.isEmpty() && !upcQuery.equals("UPC товару")) {
+            // Фільтруємо ті, що містять введений текст (або точний збіг)
+            stream = stream.filter(p -> p.getUPC().contains(upcQuery));
+        }
+
+        // --- Крок Б: Фільтр Акційні/Не акційні ---
+        if (filterIndex == 1) { // Акційні
+            stream = stream.filter(StoreProductDBModel::getPromotional_product);
+        } else if (filterIndex == 2) { // Не акційні
+            stream = stream.filter(p -> !p.getPromotional_product());
+        }
+
+        // --- Крок В: Сортування ---
+        if (sortIndex == 0) {
+            // Сортування за назвою (З урахуванням української абетки, як ми робили раніше!)
+            Collator ukCollator = Collator.getInstance(new Locale("uk", "UA"));
+            stream = stream.sorted((p1, p2) -> ukCollator.compare(p1.getProduct_name(), p2.getProduct_name()));
+        } else if (sortIndex == 1) {
+            // Сортування за кількістю (від найменшої до найбільшої)
+            stream = stream.sorted(Comparator.comparingInt(StoreProductDBModel::getProducts_number));
+
+            // Якщо хочете від найбільшої до найменшої, просто замініть рядок вище на цей:
+            // stream = stream.sorted(Comparator.comparingInt(StoreProductDBModel::getProducts_number).reversed());
+        }
+
+        // 4. Збираємо результат у новий список і віддаємо таблиці
+        java.util.List<StoreProductDBModel> filteredList = stream.collect(Collectors.toList());
+        managerView.getTable().setModel(new StoreProductFullTableModel(filteredList));
+        managerView.styleTable(); // Відновлюємо дизайн таблиці
+    }
 }
