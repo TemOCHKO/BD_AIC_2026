@@ -55,6 +55,21 @@ public class ProductsController {
             String characteristics = dialog.getCharacteristicsInput();
             String selectedCategoryName = dialog.getSelectedCategory();
 
+            if (dialog.getTitleInput().length() > 50) {
+                JOptionPane.showMessageDialog(dialog, "Назва не може бути більшою за 50 символів!", "Помилка", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (manufacturer.length() > 50) {
+                JOptionPane.showMessageDialog(dialog, "Виробник не може бути більшою за 50 символів!", "Помилка", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (characteristics.length() > 100) {
+                JOptionPane.showMessageDialog(dialog, "Характеристики не може бути більшою за 100 символів!", "Помилка", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             if (title.isEmpty() || manufacturer.isEmpty()) {
                 JOptionPane.showMessageDialog(dialog, "Назва та Виробник є обов'язковими!", "Помилка", JOptionPane.WARNING_MESSAGE);
                 return;
