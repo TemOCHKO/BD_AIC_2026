@@ -29,4 +29,5 @@ public interface IProductRepository {
      * п.5 — Пошук товарів певної категорії, відсортованих за назвою.
      */
     List<ProductDBModel> getProductsByCategorySortedByName(int categoryNumber) throws SQLException;
+    boolean updateProduct(ProductDBModel productDBModel) throws SQLException;
 }

@@ -21,7 +21,7 @@ public class EmployeesController {
         addEmployeeView = new AddEmpl(null);
         editEmployeeView = new AddEmpl(null);
         editEmployeeView.getSaveButton().setText("Update");
-        editEmployeeView.setTitle("Employee edit page");
+        editEmployeeView.getTitleLabel().setText("Редагувати працівника");
         initControllers();
     }
 

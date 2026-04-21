@@ -30,6 +30,8 @@ public class ProductDBModel {
         this.dbId = dbId;
     }
 
+    public ProductDBModel() {}
+
     public UUID getId() {
         return id;
     }

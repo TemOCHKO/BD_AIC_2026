@@ -30,4 +30,5 @@ public interface IProductService {
      */
     List<ProductDBModel> getProductsByCategorySortedByName(int categoryNumber);
     HashMap<Integer, String> getCategoryMap();
+    boolean updateProduct(ProductDBModel productDBModel);
 }

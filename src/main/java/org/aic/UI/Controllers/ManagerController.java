@@ -353,6 +353,13 @@ public class ManagerController {
                 handleTabSwitch(ManagerFrame.TAB_CLIENTS);
                 break;
             }
+            case ManagerFrame.TAB_PRODUCTS -> {
+                ProductsController prodController = new ProductsController(this, productService);
+                prodController.showAddDialog();
+
+                handleTabSwitch(ManagerFrame.TAB_PRODUCTS);
+                break;
+            }
         }
     }
 
@@ -391,6 +398,14 @@ public class ManagerController {
                 checkController.show();
 
                 handleTabSwitch(ManagerFrame.TAB_RECEIPTS);
+                break;
+            }
+            case ManagerFrame.TAB_PRODUCTS -> {
+                ProductFullTableModel model = (ProductFullTableModel) managerView.getTable().getModel();
+                ProductDBModel selectedProd = model.getProductAt(selectedRow);
+
+                ProductsController prodController = new ProductsController(this, productService);
+                prodController.showEditDialog(selectedProd);
                 break;
             }
         }

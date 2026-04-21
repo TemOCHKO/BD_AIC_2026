@@ -45,8 +45,8 @@ public class CustomerCardFullTableModel extends AbstractTableModel {
         // Map each column index to the correct Client field
         return switch (columnIndex) {
             case 0 -> client.getCard_number();
-            case 1 -> client.getCust_surname();
-            case 2 -> client.getCust_name();
+            case 2 -> client.getCust_surname();
+            case 1 -> client.getCust_name();
 
             // Handle patronymic (it can sometimes be null or empty in real life)
             case 3 -> (client.getCust_patronymic() != null) ? client.getCust_patronymic() : "";

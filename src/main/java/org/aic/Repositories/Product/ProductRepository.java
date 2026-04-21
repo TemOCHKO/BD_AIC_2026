@@ -139,4 +139,31 @@ public class ProductRepository implements IProductRepository {
         return list;
     }
 
+    @Override
+    public boolean updateProduct(ProductDBModel product) {
+        // Assuming your DB columns are named like this based on your previous diagram/model
+        String sql = "UPDATE Product SET product_name = ?, producer = ?, characteristics = ?, category_number = ? WHERE id_product = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            // 1. Set the values we want to update
+            stmt.setString(1, product.getTitle());
+            stmt.setString(2, product.getManufacturer());
+            stmt.setString(3, product.getDescription());
+            stmt.setInt(4, product.getCategoryNumber());
+
+            // 2. Identify WHICH row to update using the dbId
+            stmt.setInt(5, product.getDbId());
+
+            // 3. Execute the update and check if it actually changed a row
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Depending on your error handling, you might want to throw this
+            // back to the Service layer instead of just returning false!
+            return false;
+        }
+    }
 }

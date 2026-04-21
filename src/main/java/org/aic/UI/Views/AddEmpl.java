@@ -41,6 +41,7 @@ public class AddEmpl extends JDialog {
     private static final Font FONT_BTN   = new Font("SansSerif", Font.PLAIN, 13);
 
     // ── Fields ───────────────────────────────────────────────────────────────
+    JLabel title;
     private JButton save;
     private JButton cancel;
     private JTextField       tfSurname, tfName, tfPatronymic;
@@ -92,7 +93,7 @@ public class AddEmpl extends JDialog {
         card.setBorder(new EmptyBorder(10, 10, 22, 10));
         card.setPreferredSize(new Dimension(500, 600));
 
-        JLabel title = new JLabel("Додати нового працівника");
+        title = new JLabel("Додати нового працівника");
         title.setFont(FONT_TITLE);
         title.setForeground(FG_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -381,6 +382,10 @@ public class AddEmpl extends JDialog {
 
     public DatePicker getDosField() {
         return spStart;
+    }
+
+    public JLabel getTitleLabel() {
+        return title;
     }
 
     public void setEmployeeData(String surname, String name, String patronymic,

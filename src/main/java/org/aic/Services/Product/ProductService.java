@@ -104,4 +104,13 @@ public class ProductService implements IProductService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean updateProduct(ProductDBModel productDBModel) {
+        try {
+            return productRepository.updateProduct(productDBModel);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
