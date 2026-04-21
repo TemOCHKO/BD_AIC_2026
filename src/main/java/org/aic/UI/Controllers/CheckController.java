@@ -32,12 +32,11 @@ public class CheckController {
         try {
             String newCardNumber = dialog.getCardNumber();
 
-            // Оновлюємо модель
-            // Якщо поле порожнє, передаємо null у базу даних (картка не використана)
+            // update the model. if not empty then its new
             check.setCard_number(newCardNumber.isEmpty() ? null : newCardNumber);
 
             // TODO: Викличте метод вашого сервісу для оновлення в базі:
-            // checkService.updateCheck(check);
+            checkService.updateCheck(check);
 
             dialog.dispose();
             parent.handleTabSwitch(ManagerFrame.TAB_RECEIPTS); // Оновлюємо таблицю

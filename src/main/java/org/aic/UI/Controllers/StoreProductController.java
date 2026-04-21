@@ -25,7 +25,7 @@ public class StoreProductController {
 
     public void showAddDialog() {
         dialog = new StoreProductDialog(parent.getManagerView(), "Додати товар у магазин");
-        dialog.setUPCVisible(false); // <--- Приховуємо поле UPC при додаванні!
+        dialog.setUPCVisible(false);
         setupDialog(null);
         dialog.setVisible(true);
     }
@@ -37,7 +37,6 @@ public class StoreProductController {
     }
 
     private void setupDialog(StoreProductDBModel item) {
-        // Завантажуємо список базових товарів
         var products = productService.getAllProducts().stream()
                 .map(p -> new StoreProductDialog.ProductItem(p.getDbId(), p.getTitle()))
                 .collect(Collectors.toList());
@@ -55,7 +54,7 @@ public class StoreProductController {
                     dialog.getUPC(),
                     dialog.getUPCProm().isEmpty() ? null : dialog.getUPCProm(),
                     dialog.getSelectedProductId(),
-                    "", // назва підтягнеться в базі
+                    "",
                     dialog.getPrice(),
                     dialog.getQuantity(),
                     dialog.isPromotional()
@@ -69,7 +68,7 @@ public class StoreProductController {
             }
 
             dialog.dispose();
-            parent.handleTabSwitch(ManagerFrame.TAB_STORE); // Оновити таблицю
+            parent.handleTabSwitch(ManagerFrame.TAB_STORE);
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(dialog, "Помилка: " + ex.getMessage());

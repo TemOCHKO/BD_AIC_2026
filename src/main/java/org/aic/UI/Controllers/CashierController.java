@@ -48,17 +48,16 @@ public class CashierController {
     private final IStoreProductService storeProductService;
     private final ICheckService checkService;
     private final ICustomerCardService customerCardService;
+    private final IEmployeeService employeeService;
 
-    // Контролери для додавання/редагування
     private AddCustomerCardController addCustomerCardController;
-
-    // ЗВЕРНІТЬ УВАГУ: Немає IEmployeeService
-    public CashierController(CashierFrame cashierView, IProductService productService, IStoreProductService storeProductService, ICheckService checkService, ICustomerCardService customerCardService) {
+    public CashierController(CashierFrame cashierView, IEmployeeService employeeService, IProductService productService, IStoreProductService storeProductService, ICheckService checkService, ICustomerCardService customerCardService) {
         this.cashierView = cashierView;
         this.productService = productService;
         this.storeProductService = storeProductService;
         this.checkService = checkService;
         this.customerCardService = customerCardService;
+        this.employeeService = employeeService;
 
         initController();
     }
@@ -70,12 +69,10 @@ public class CashierController {
             tabButtons[i].addActionListener(e -> handleTabSwitch(tabIndex));
         }
 
-        // Прив'язуємо кнопки (Кнопки "Видалити" у касира немає)
         cashierView.getAddButton().addActionListener(e -> handleAddAction());
         cashierView.getEditButton().addActionListener(e -> handleEditAction());
         cashierView.getSearchField().addActionListener(e -> handleSearch());
 
-        // Завантажуємо першу вкладку (Товари)
         handleTabSwitch(CashierFrame.TAB_PRODUCTS);
     }
 
@@ -86,12 +83,9 @@ public class CashierController {
         cashierView.getTableModel().setRowCount(0);
         cashierView.styleTable();
 
-        // ════ ЛОГІКА ДОСТУПУ КАСИРА ════
-        // Касир може ДОДАВАТИ тільки Чеки та Клієнтів
         boolean canAdd = (tabIndex == CashierFrame.TAB_RECEIPTS || tabIndex == CashierFrame.TAB_CLIENTS);
         cashierView.getAddButton().setVisible(canAdd);
 
-        // Касир може РЕДАГУВАТИ тільки Клієнтів
         boolean canEdit = (tabIndex == CashierFrame.TAB_CLIENTS);
         cashierView.getEditButton().setVisible(canEdit);
         // ═══════════════════════════════
@@ -112,6 +106,7 @@ public class CashierController {
             case CashierFrame.TAB_RECEIPTS -> {
                 var checkList = checkService.getAllChecks();
                 cashierView.getTable().setModel(new CheckFullTableModel(checkList));
+                cashierView.getAddButton().setVisible(true);
                 initReceiptController();
                 cashierView.styleTable();
             }
@@ -119,6 +114,7 @@ public class CashierController {
                 var customerList = customerCardService.getAllCustomerCards();
                 cashierView.getTable().setModel(new CustomerCardFullTableModel(customerList));
                 initClientController();
+                cashierView.getAddButton().setVisible(false);
                 cashierView.styleTable();
             }
         }
@@ -128,10 +124,9 @@ public class CashierController {
         int currentTab = cashierView.getActiveTab();
         switch (currentTab) {
             case CashierFrame.TAB_RECEIPTS -> {
-                // TODO: Виклик вашого контролера для створення чека (каси)
-                // ReceiptController receiptCtrl = new ReceiptController(...);
-                // receiptCtrl.showCreateReceiptDialog();
-                JOptionPane.showMessageDialog(cashierView, "Тут відкриється вікно каси для пробиття нового чека!");
+                var addCheckController = new AddCheckController(null, checkService, employeeService, customerCardService);
+                addCheckController.show();
+
                 handleTabSwitch(CashierFrame.TAB_RECEIPTS);
             }
             case CashierFrame.TAB_CLIENTS -> {
@@ -151,7 +146,6 @@ public class CashierController {
             return;
         }
 
-        // Касир може редагувати ТІЛЬКИ клієнтів
         if (currentTab == CashierFrame.TAB_CLIENTS) {
             CustomerCardFullTableModel model = (CustomerCardFullTableModel) cashierView.getTable().getModel();
             addCustomerCardController = new AddCustomerCardController(null, customerCardService, model.getClientAt(selectedRow));
@@ -160,9 +154,6 @@ public class CashierController {
         }
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // МЕТОДИ ФІЛЬТРІВ (Цілком ідентичні до ManagerController)
-    // ═════════════════════════════════════════════════════════════════════════
 
     private void handleSearch() {
         int tab = cashierView.getActiveTab();
@@ -293,7 +284,7 @@ public class CashierController {
             CashierFrame view = new CashierFrame();
 
             // 2. Create the Controller, passing the View as a dependency
-            CashierController controller = new CashierController(view, prService, storeProductService, checkService, customerCardService);
+            CashierController controller = new CashierController(view, emplService, prService, storeProductService, checkService, customerCardService);
 
             // 3. Show the View
             view.setVisible(true);

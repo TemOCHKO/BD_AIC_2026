@@ -4,13 +4,11 @@ import org.aic.DBModels.ProductDBModel;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
-// import org.aic.Models.Product; // Import your Product domain model!
 
 public class ProductFullTableModel extends AbstractTableModel {
 
     private final List<ProductDBModel> products;
 
-    // Matches the exact columns from TAB_PRODUCTS in ManagerFrame
     private final String[] columnNames = {
             "ID товару", "Назва", "Виробник", "Характеристики", "Категорія"
     };
@@ -41,11 +39,11 @@ public class ProductFullTableModel extends AbstractTableModel {
         // Map each column index to the correct Product field
         // Note: Make sure these getter names match exactly what is in your Product class!
         return switch (columnIndex) {
-            case 0 -> p.getDbId();             // ID товару
-            case 1 -> p.getTitle();            // Назва
-            case 2 -> p.getManufacturer();     // Виробник
-            case 3 -> p.getDescription();      // Характеристики
-            case 4 -> p.getCategoryNumber();   // Категорія
+            case 0 -> p.getDbId();
+            case 1 -> p.getTitle();
+            case 2 -> p.getManufacturer();
+            case 3 -> p.getDescription();
+            case 4 -> p.getCategoryNumber();
             default -> null;
         };
     }

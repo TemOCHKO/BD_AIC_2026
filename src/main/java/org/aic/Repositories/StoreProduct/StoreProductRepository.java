@@ -59,12 +59,8 @@ public class StoreProductRepository implements IStoreProductRepository {
         return list;
     }
 
-    // 4. ПЕРЕОЦІНКА: Коли приходить нова партія (Вимога 2.1.2.1)
-    // Якщо ціна змінюється, вона змінюється для всіх одиниць цього товару
     public void updateProductPrice(int idProduct, double newPrice) throws SQLException {
-        // Оновлюємо ціну для всіх звичайних товарів з цим ID
         String sqlNormal = "UPDATE Store_Product SET selling_price = ? WHERE id_product = ? AND promotional_product = false";
-        // Оновлюємо ціну для акційних (нова ціна - 20%)
         String sqlPromo = "UPDATE Store_Product SET selling_price = ? * 0.8 WHERE id_product = ? AND promotional_product = true";
 
         PreparedStatement st1 = connection.prepareStatement(sqlNormal);

@@ -17,12 +17,10 @@ public class AddCustomerCardController {
     private final Mode                 mode;
     private       CustomerCardDBModel  original; // для редагування
 
-    // ── Додавання ─────────────────────────────────────────────────
     public AddCustomerCardController(Frame owner, ICustomerCardService service) {
         this(owner, service, Mode.ADD, null);
     }
 
-    // ── Редагування ───────────────────────────────────────────────
     public AddCustomerCardController(Frame owner, ICustomerCardService service,
                                  CustomerCardDBModel card) {
         this(owner, service, Mode.EDIT, card);
@@ -46,7 +44,6 @@ public class AddCustomerCardController {
     }
 
     private void handleSave() {
-        // ── Валідація ─────────────────────────────────────────────
         String surname    = view.getSurname();
         String name       = view.getName();
         String patronymic = view.getPatronymic();

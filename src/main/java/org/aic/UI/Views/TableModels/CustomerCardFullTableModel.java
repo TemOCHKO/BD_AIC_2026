@@ -6,9 +6,8 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 public class CustomerCardFullTableModel extends AbstractTableModel {
-    private final List<CustomerCardDBModel> clients; // Assuming your class is named Client or Customer
+    private final List<CustomerCardDBModel> clients;
 
-    // Matches the exact columns from TAB_CLIENTS in ManagerFrame
     private final String[] columnNames = {
             "Номер карти",
             "Прізвище",
@@ -42,21 +41,17 @@ public class CustomerCardFullTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         CustomerCardDBModel client = clients.get(rowIndex);
 
-        // Map each column index to the correct Client field
         return switch (columnIndex) {
             case 0 -> client.getCard_number();
-            case 2 -> client.getCust_surname();
-            case 1 -> client.getCust_name();
+            case 1 -> client.getCust_surname();
+            case 2 -> client.getCust_name();
 
-            // Handle patronymic (it can sometimes be null or empty in real life)
             case 3 -> (client.getCust_patronymic() != null) ? client.getCust_patronymic() : "";
 
             case 4 -> client.getPhone_number();
 
-            // 🔥 THE MAGIC: Combine city, street, and zip into one clean Address string
             case 5 -> formatAddress(client.getCity(), client.getStreet(), client.getZip_code());
 
-            // Add a nice % sign to the integer for the UI
             case 6 -> client.getPercent() + " %";
 
             default -> null;
@@ -85,15 +80,11 @@ public class CustomerCardFullTableModel extends AbstractTableModel {
         return null;
     }
 
-    /**
-     * Use this to refresh the table with new search results (e.g., when
-     * searching by discount percentage or surname).
-     */
     public void setClients(List<CustomerCardDBModel> newClients) {
         this.clients.clear();
         if (newClients != null) {
             this.clients.addAll(newClients);
         }
-        fireTableDataChanged(); // Tells JTable to re-render
+        fireTableDataChanged();
     }
 }

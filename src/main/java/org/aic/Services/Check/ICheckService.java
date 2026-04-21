@@ -9,4 +9,5 @@ public interface ICheckService {
     List<CheckDBModel> getAllChecks();
     boolean deleteCheck(String checkNumber);
     void saveCheck(CheckDBModel check);
+    boolean updateCheck(CheckDBModel check);
 }

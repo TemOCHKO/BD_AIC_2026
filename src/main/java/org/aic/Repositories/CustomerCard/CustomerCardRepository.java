@@ -40,8 +40,8 @@ public class CustomerCardRepository implements ICustomerCardRepository {
         while (rs.next()) {
             CustomerCardDBModel c = new CustomerCardDBModel(
                     rs.getString("card_number"),
-                    rs.getString("cust_surname"),
                     rs.getString("cust_name"),
+                    rs.getString("cust_surname"),
                     rs.getString("cust_patronymic"),
                     rs.getString("phone_number"),
                     rs.getString("city"),
@@ -92,8 +92,8 @@ public class CustomerCardRepository implements ICustomerCardRepository {
         while (rs.next()) {
             list.add(new CustomerCardDBModel(
                     rs.getString("card_number"),
-                    rs.getString("cust_surname"),
                     rs.getString("cust_name"),
+                    rs.getString("cust_surname"),
                     rs.getString("cust_patronymic"),
                     rs.getString("phone_number"),
                     rs.getString("city"),
@@ -130,8 +130,8 @@ public class CustomerCardRepository implements ICustomerCardRepository {
         while (rs.next()) {
             list.add(new CustomerCardDBModel(
                     rs.getString("card_number"),
-                    rs.getString("cust_surname"),
                     rs.getString("cust_name"),
+                    rs.getString("cust_surname"),
                     rs.getString("cust_patronymic"),
                     rs.getString("phone_number"),
                     rs.getString("city"),
@@ -153,8 +153,8 @@ public class CustomerCardRepository implements ICustomerCardRepository {
         while (rs.next()) {
             list.add(new CustomerCardDBModel(
                     rs.getString("card_number"),
-                    rs.getString("cust_surname"),
                     rs.getString("cust_name"),
+                    rs.getString("cust_surname"),
                     rs.getString("cust_patronymic"),
                     rs.getString("phone_number"),
                     rs.getString("city"),

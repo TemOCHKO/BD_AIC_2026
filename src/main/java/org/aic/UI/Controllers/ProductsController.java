@@ -19,14 +19,12 @@ public class ProductsController {
         this.productService = productService;
     }
 
-    // Call this for ADDING a new product
     public void showAddDialog() {
         dialog = new ProductDialog(parentController.getManagerView(), "Додати новий товар");
         initDialog();
         dialog.setVisible(true);
     }
 
-    // Call this for EDITING an existing product
     public void showEditDialog(ProductDBModel productToEdit) {
         dialog = new ProductDialog(parentController.getManagerView(), "Редагувати товар");
         initDialog();
@@ -87,11 +85,9 @@ public class ProductsController {
 
             // 4. Send to Database
             if (isNew) {
-                // TODO: Call your service to INSERT
                 productService.saveNewProduct(product);
                 JOptionPane.showMessageDialog(dialog, "Товар успішно додано!");
             } else {
-                // TODO: Call your service to UPDATE
                 productService.updateProduct(product);
                 JOptionPane.showMessageDialog(dialog, "Зміни успішно збережено!");
             }

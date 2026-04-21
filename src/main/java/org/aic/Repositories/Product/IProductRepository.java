@@ -20,14 +20,8 @@ public interface IProductRepository {
 
     boolean deleteProductById(int idProduct) throws SQLException, SQLIntegrityConstraintViolationException;
 
-    /**
-     * п.4 — Пошук товарів за назвою (часткове співпадіння).
-     */
     List<ProductDBModel> getProductsByName(String name) throws SQLException;
 
-    /**
-     * п.5 — Пошук товарів певної категорії, відсортованих за назвою.
-     */
     List<ProductDBModel> getProductsByCategorySortedByName(int categoryNumber) throws SQLException;
     boolean updateProduct(ProductDBModel productDBModel) throws SQLException;
 }

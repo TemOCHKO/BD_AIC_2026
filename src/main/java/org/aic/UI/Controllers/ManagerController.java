@@ -71,19 +71,16 @@ public class ManagerController {
         managerView.setActiveTab(idx);
         managerView.getTabBar().repaint();
 
-        // Swap filter panel
         managerView.getContentCenter().remove(managerView.getFilterPanel());
         managerView.setFilterPanel(managerView.buildFilterPanel(idx));
         managerView.getContentCenter().add(managerView.getFilterPanel(), BorderLayout.NORTH);
         managerView.getContentCenter().revalidate();
         managerView.getContentCenter().repaint();
 
-        // Reset table columns
         managerView.getTableModel().setColumnIdentifiers(ManagerFrame.getColumns()[idx]);
         managerView.getTableModel().setRowCount(0);
         managerView.styleTable();
 
-        // Hide "Додати" on Receipts tab (тільки касир створює чеки)
         managerView.getAddButton().setVisible(idx != ManagerFrame.TAB_RECEIPTS);
     }
 
@@ -104,11 +101,9 @@ public class ManagerController {
         managerView.getAddButton().addActionListener(e -> handleAddAction());
         managerView.getEditButton().addActionListener(e -> handleEditAction());
         managerView.getSearchField().addActionListener(e -> handleSearch());
-        // Example of where you will bind other UI actions:
-        // Using an ItemListener (Recommended for Checkboxes)
+
         initEmployeeController();
-        // view.getAddButton().addActionListener(e -> handleAddAction());
-        // view.getBtnSortBySurname().addActionListener(e -> handleSortEmployees());
+
     }
 
     private void initEmployeeController() {
@@ -117,14 +112,12 @@ public class ManagerController {
             boolean isChecked = managerView.getChkCashiersOnly().isSelected();
             EmployeeFullTableModel tableModel;
             if (isChecked) {
-                //System.out.println("Checkbox is CHECKED! Filtering for cashiers only...");
                 tableModel = new EmployeeFullTableModel(employeeService.getOnlyCashiers());
                 managerView.getTable().setModel(tableModel);
 
                 managerView.styleTable();
             } else {
                 isSurnameAscending = false;
-                //System.out.println("Checkbox is UNCHECKED! Showing all employees...");
                 tableModel = new EmployeeFullTableModel(employeeService.getAllEmployees());
                 managerView.getTable().setModel(tableModel);
 
@@ -191,8 +184,6 @@ public class ManagerController {
         // 3. Controller logic: "Add" button is hidden on the Receipts tab
         managerView.getAddButton().setVisible(tabIndex != ManagerFrame.TAB_RECEIPTS);
 
-        // 4. TODO: Fetch data for this tab from your Service/Repository layers
-
         switch (tabIndex) {
             case ManagerFrame.TAB_EMPLOYEES:
                 var list = employeeService.getAllEmployeesSortedBySurname();
@@ -241,8 +232,6 @@ public class ManagerController {
             default:
                 break;
         }
-        // Object[][] tabData = storageService.getDataForTab(tabIndex);
-        // view.setTableData(columns, tabData);
     }
 
     private void handleDeleteAction() {
@@ -259,17 +248,15 @@ public class ManagerController {
             return;
         }
 
-        // 3. (Optional but recommended) Ask for confirmation
         int confirm = JOptionPane.showConfirmDialog(managerView,
                 "Ви впевнені, що хочете видалити цей запис?",
                 "Підтвердження видалення",
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm != JOptionPane.YES_OPTION) {
-            return; // User clicked "No" or closed the dialog
+            return;
         }
 
-        // 4. Route the delete logic based on the active tab
         switch (currentTab) {
             case ManagerFrame.TAB_EMPLOYEES -> {
                 EmployeeFullTableModel model = (EmployeeFullTableModel) managerView.getTable().getModel();
@@ -341,7 +328,6 @@ public class ManagerController {
                 handleTabSwitch(ManagerFrame.TAB_CLIENTS);
             }
 
-            // Add cases for TAB_STORE, TAB_RECEIPTS, TAB_CLIENTS as needed
             default -> {
                 System.out.println("Видалення не підтримується для цієї вкладки.");
             }
@@ -378,6 +364,7 @@ public class ManagerController {
                 spCtrl.showAddDialog();
                 break;
             }
+
         }
     }
 
@@ -413,10 +400,16 @@ public class ManagerController {
             }
             case ManagerFrame.TAB_RECEIPTS -> {
                 CheckFullTableModel model = (CheckFullTableModel) managerView.getTable().getModel();
-                checkController = new CheckController(this, checkService);
-                checkController.showEditDialog(model.getCheckAt(selectedRow));
+                CheckDBModel selectedCheck = model.getCheckAt(selectedRow);
 
-                handleTabSwitch(ManagerFrame.TAB_RECEIPTS);
+                CheckEditController editController = new CheckEditController(
+                        this,
+                        checkService,
+                        employeeService,
+                        customerCardService
+                );
+
+                editController.showEditDialog(selectedCheck);
                 break;
             }
             case ManagerFrame.TAB_PRODUCTS -> {
@@ -495,13 +488,6 @@ public class ManagerController {
         return managerView;
     }
 
-    // ═══════════════════════════════════════════════
-    // ПОШУК (п.4 — за назвою товару, п.6 — за прізвищем клієнта)
-    // ═══════════════════════════════════════════════
-
-    /**
-     * Головний диспетчер пошуку — визначає що шукати залежно від активного табу.
-     */
     private void handleSearch() {
         int tab = managerView.getActiveTab();
         String query = managerView.getSearchField().getText().trim();
@@ -513,10 +499,7 @@ public class ManagerController {
         }
     }
 
-    /**
-     * п.4 — Пошук товарів за назвою (часткове співпадіння).
-     * Якщо поле порожнє — показує всі товари.
-     */
+
     private void searchProductsByName(String name) {
         if (name.isEmpty()) {
             var list = productService.getAllProducts();
@@ -528,10 +511,7 @@ public class ManagerController {
         managerView.styleTable();
     }
 
-    /**
-     * п.6 — Пошук постійних клієнтів за прізвищем.
-     * Якщо поле порожнє — показує всіх клієнтів.
-     */
+
     private void searchClientsBySurname(String surname) {
         if (surname.isEmpty()) {
             var list = customerCardService.getAllCustomerCards();
@@ -543,34 +523,27 @@ public class ManagerController {
         managerView.styleTable();
     }
 
-    /**
-     * п.5 — Пошук товарів певної категорії, відсортованих за назвою.
-     * п.4 — Пошук товарів за назвою (через searchField у хедері).
-     */
+
     private void initProductController() {
-        // Заповнити дропдаун категорій
+
         var categoryNames = productService.getCategoryMap().values().toArray(String[]::new);
         managerView.setCategories(categoryNames);
 
-        // п.5 — кнопка "Фільтр за категорією"
         managerView.getBtnFilterByCategory().addActionListener(e -> filterProductsByCategory());
     }
 
-    /**
-     * п.5 — Фільтрація товарів за категорією, відсортованих за назвою.
-     */
+
     private void filterProductsByCategory() {
         String selected = (String) managerView.getCbProductCategory().getSelectedItem();
 
         if (selected == null || selected.equals("Всі категорії")) {
-            // Показати всі товари
+
             var list = productService.getAllProducts();
             managerView.getTable().setModel(new ProductFullTableModel(list));
             managerView.styleTable();
             return;
         }
 
-        // Знайти id категорії по назві
         int categoryId = -1;
         for (var entry : productService.getCategoryMap().entrySet()) {
             if (entry.getValue().equals(selected)) {
@@ -586,19 +559,17 @@ public class ManagerController {
     }
 
     private void initClientController() {
-        // Очищаємо всі попередні слухачі, щоб уникнути дублювання
         for (ActionListener al : managerView.getBtnFilterByDiscount().getActionListeners()) {
             managerView.getBtnFilterByDiscount().removeActionListener(al);
         }
 
-        // Додаємо слухача на кнопку "Фільтр"
+
         managerView.getBtnFilterByDiscount().addActionListener(e -> filterClientsByDiscount());
     }
 
     private void filterClientsByDiscount() {
         String discountText = managerView.getTxtDiscountFilter().getText().trim();
 
-        // Якщо поле порожнє або містить текст-підказку, показуємо всіх клієнтів
         if (discountText.isEmpty() || discountText.equals("Знижка %")) {
             var list = customerCardService.getAllCustomerCards();
             managerView.getTable().setModel(new CustomerCardFullTableModel(list));
@@ -607,25 +578,23 @@ public class ManagerController {
         }
 
         try {
-            // Перетворюємо введений текст на число
+
             int percent = Integer.parseInt(discountText);
 
-            // Викликаємо сервіс для отримання клієнтів з конкретною знижкою
+
             var list = customerCardService.getCustomersByPercent(percent);
 
-            // Оновлюємо таблицю
+
             managerView.getTable().setModel(new CustomerCardFullTableModel(list));
             managerView.styleTable();
 
         } catch (NumberFormatException ex) {
-            // Якщо користувач ввів літери замість цифр
             showInputErrorMessage("Будь ласка, введіть коректне число (відсоток) для фільтрації.");
         }
     }
 
 
     private void initStoreController() {
-        // 1. Очищаємо попередні слухачі, щоб уникнути подвійних спрацьовувань
         for (java.awt.event.ActionListener al : managerView.getCbStoreFilter().getActionListeners()) {
             managerView.getCbStoreFilter().removeActionListener(al);
         }
@@ -636,61 +605,46 @@ public class ManagerController {
             managerView.getBtnFindByUpc().removeActionListener(al);
         }
 
-        // 2. Вішаємо слухачів на зміну значення у випадних списках
         managerView.getCbStoreFilter().addActionListener(e -> applyStoreFiltersAndSort());
         managerView.getCbStoreSort().addActionListener(e -> applyStoreFiltersAndSort());
 
-        // 3. Вішаємо слухача на кнопку пошуку за UPC
         managerView.getBtnFindByUpc().addActionListener(e -> applyStoreFiltersAndSort());
     }
 
     private void applyStoreFiltersAndSort() {
-        // 1. Отримуємо ВЕСЬ список товарів магазину з бази даних
-        // (Використовуємо існуючий метод сервісу)
+
         java.util.List<StoreProductDBModel> allStoreProducts = storeProductService.getAllSortedByName();
 
-        // 2. Зчитуємо поточний стан UI-елементів
         int filterIndex = managerView.getCbStoreFilter().getSelectedIndex(); // 0: Всі, 1: Акційні, 2: Не акційні
         int sortIndex = managerView.getCbStoreSort().getSelectedIndex();     // 0: За назвою, 1: За к-стю
         String upcQuery = managerView.getTxtUpc().getText().trim();
 
-        // 3. Відкриваємо Stream для поєднання всіх фільтрів
         Stream<StoreProductDBModel> stream = allStoreProducts.stream();
 
-        // --- Крок А: Пошук за UPC ---
         if (!upcQuery.isEmpty() && !upcQuery.equals("UPC товару")) {
-            // Фільтруємо ті, що містять введений текст (або точний збіг)
             stream = stream.filter(p -> p.getUPC().contains(upcQuery));
         }
 
-        // --- Крок Б: Фільтр Акційні/Не акційні ---
-        if (filterIndex == 1) { // Акційні
+        if (filterIndex == 1) {
             stream = stream.filter(StoreProductDBModel::getPromotional_product);
         } else if (filterIndex == 2) { // Не акційні
             stream = stream.filter(p -> !p.getPromotional_product());
         }
 
-        // --- Крок В: Сортування ---
         if (sortIndex == 0) {
-            // Сортування за назвою (З урахуванням української абетки, як ми робили раніше!)
             Collator ukCollator = Collator.getInstance(new Locale("uk", "UA"));
             stream = stream.sorted((p1, p2) -> ukCollator.compare(p1.getProduct_name(), p2.getProduct_name()));
         } else if (sortIndex == 1) {
-            // Сортування за кількістю (від найменшої до найбільшої)
             stream = stream.sorted(Comparator.comparingInt(StoreProductDBModel::getProducts_number));
 
-            // Якщо хочете від найбільшої до найменшої, просто замініть рядок вище на цей:
-            // stream = stream.sorted(Comparator.comparingInt(StoreProductDBModel::getProducts_number).reversed());
         }
 
-        // 4. Збираємо результат у новий список і віддаємо таблиці
         java.util.List<StoreProductDBModel> filteredList = stream.collect(Collectors.toList());
         managerView.getTable().setModel(new StoreProductFullTableModel(filteredList));
         managerView.styleTable(); // Відновлюємо дизайн таблиці
     }
 
     private void initReceiptController() {
-        // Очищаємо попередні слухачі
         for (java.awt.event.ActionListener al : managerView.getBtnFilterReceipts().getActionListeners()) {
             managerView.getBtnFilterReceipts().removeActionListener(al);
         }
@@ -702,42 +656,34 @@ public class ManagerController {
         List<CheckDBModel> allChecks = checkService.getAllChecks();
         Stream<CheckDBModel> stream = allChecks.stream();
 
-        // 1. Фільтр за касиром
         String selectedCashier = (String) managerView.getCbCashier().getSelectedItem();
         if (selectedCashier != null && !selectedCashier.equals("Всі касири")) {
             stream = stream.filter(c -> c.getId_employee().equals(selectedCashier));
         }
 
-        // 2. Отримуємо значення з LGoodDatePicker
         LocalDate dateFrom = managerView.getDpDateFrom().getDate();
         LocalDate dateTo = managerView.getDpDateTo().getDate();
 
-        // 3. Фільтрація за датами
         stream = stream.filter(c -> {
             try {
-                // ВИПРАВЛЕНО: Використовуємо java.sql.Timestamp, він "пробачає" всі SQL-формати!
                 LocalDate checkDate = java.sql.Timestamp.valueOf(c.getPrint_date()).toLocalDateTime().toLocalDate();
 
-                // Перевірка "ВІД"
                 if (dateFrom != null && checkDate.isBefore(dateFrom)) {
                     return false;
                 }
 
-                // Перевірка "ДО"
                 if (dateTo != null && checkDate.isAfter(dateTo)) {
                     return false;
                 }
 
-                return true; // Дата підходить!
+                return true;
 
             } catch (IllegalArgumentException e) {
-                // Якщо дата зовсім бита, пропускаємо цей чек і виводимо помилку
                 System.err.println("Помилка дати чека: " + c.getPrint_date());
                 return false;
             }
         });
 
-        // 4. Оновлюємо таблицю
         List<CheckDBModel> filteredChecks = stream.collect(Collectors.toList());
         managerView.getTable().setModel(new CheckFullTableModel(filteredChecks));
         managerView.styleTable();

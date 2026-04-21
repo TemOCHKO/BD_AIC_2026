@@ -4,17 +4,15 @@ import org.aic.DBModels.StoreProductDBModel;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
-// import org.aic.Models.StoreProduct; // Import your actual domain class here!
 
 public class StoreProductFullTableModel extends AbstractTableModel {
 
     private final List<StoreProductDBModel> storeProducts;
 
-    // Defined based on the 6 fields in your entity
     private final String[] columnNames = {
             "UPC",
             "UPC Акційного",
-            "Назва", // <--- Changed from ID
+            "Назва",
             "Ціна",
             "Кількість",
             "Акційний"
@@ -46,7 +44,7 @@ public class StoreProductFullTableModel extends AbstractTableModel {
         return switch (columnIndex) {
             case 0 -> sp.getUPC();
             case 1 -> sp.getUPC_prom() != null ? sp.getUPC_prom() : "-";
-            case 2 -> sp.getProduct_name(); // <--- Now it shows "Молоко" instead of "12"
+            case 2 -> sp.getProduct_name();
             case 3 -> sp.getSelling_price();
             case 4 -> sp.getProducts_number();
             case 5 -> sp.getPromotional_product() ? "Так" : "Ні";
@@ -64,15 +62,12 @@ public class StoreProductFullTableModel extends AbstractTableModel {
         return null;
     }
 
-    /**
-     * Use this to refresh the table with new search/filter results
-     * without creating a whole new TableModel instance.
-     */
+
     public void setStoreProducts(List<StoreProductDBModel> newStoreProducts) {
         this.storeProducts.clear();
         if (newStoreProducts != null) {
             this.storeProducts.addAll(newStoreProducts);
         }
-        fireTableDataChanged(); // Tells JTable to re-render
+        fireTableDataChanged();
     }
 }

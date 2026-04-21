@@ -14,4 +14,5 @@ public interface ICheckRepository {
     CheckDBModel getCheckByNumber(String checkNumber) throws SQLException;
     List<CheckDBModel> getChecksByEmployeeToday(String idEmployee) throws SQLException;
     List<CheckDBModel> getChecksByPeriod(String dateFrom, String dateTo) throws SQLException;
+    boolean updateCheck(CheckDBModel check) throws SQLException;
 }

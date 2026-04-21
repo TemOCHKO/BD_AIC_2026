@@ -364,6 +364,7 @@ public class CashierFrame extends JFrame {
     public JTextField        getTxtDiscountFilter()   { return txtDiscountFilter; }
     public JButton           getBtnFilterByDiscount() { return btnFilterByDiscount; }
 
+
     public void setCategories(String[] categories) {
         if (cbProductCategory == null) return;
         cbProductCategory.removeAllItems();

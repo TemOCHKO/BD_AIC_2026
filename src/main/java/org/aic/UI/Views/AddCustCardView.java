@@ -134,7 +134,7 @@ public class AddCustCardView extends JDialog {
         p.setOpaque(false);
 
         saveButton   = button("Зберегти",   BTN_LIGHT, Color.BLACK);
-        cancelButton = button("Скасувати",  BTN_DARK,  Color.WHITE);
+        cancelButton = button("Скасувати",  BTN_DARK,  Color.BLACK);
 
         cancelButton.addActionListener(e -> dispose());
 

@@ -38,4 +38,13 @@ public class CheckService implements ICheckService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean updateCheck(CheckDBModel check) {
+        try {
+            return repository.updateCheck(check);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

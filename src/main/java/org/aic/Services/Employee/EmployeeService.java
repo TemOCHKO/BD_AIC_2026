@@ -125,7 +125,7 @@ public class EmployeeService implements IEmployeeService {
         for (var empl : employeeList) {
             if (empl.getId_employee().equalsIgnoreCase(id)) {
                 employeeList.remove(empl);
-                break; // <--- This stops the loop instantly, preventing the crash!
+                break;
             }
         }
     }
